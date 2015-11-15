@@ -174,7 +174,7 @@ public class IntersectionController : MonoBehaviour {
         semaphore1.Find("pedestrianVerticalRed").GetComponent<MeshRenderer>().enabled = false;
         semaphore1.Find("pedestrianHorizontalGreen").GetComponent<MeshRenderer>().enabled = false;
         semaphore1.Find("pedestrianHorizontalRed").GetComponent<MeshRenderer>().enabled = true;
-
+    
         Transform semaphore2 = transform.Find("semaphore2");
         semaphore2.Find("pedestrianVerticalGreen").GetComponent<MeshRenderer>().enabled = true;
         semaphore2.Find("pedestrianVerticalRed").GetComponent<MeshRenderer>().enabled = false;
