@@ -6,36 +6,40 @@ using System.Collections;
 /// Characters require waypoints to be able to move. They have the predefined waypoints, but can be ordered to use the user defined waypoints.
 /// </summary>
 public class PedestrianController :MonoBehaviour {
+    private static GameObject[] allWaypoints;//array of all waypoints in the scene
+
     private const float MINIMAL_DISTANCE_TO_POINT = 1f;//when the pedestrian is at this distance from waypoint, he will be considered to be at that waypoint; used to prevent characters to be at the same exact coordinates while waiting on a waypoint
-    private Transform[] wayPoints;//array of all waypoints this pedestrian is going to visit
-    private int currentPosition;//index of the current waypoint in the array of waypoints
     private Transform currentWaypoint;//current target waypoint
+    private Transform previousWaypoint;//last visited waypoint
     private bool isPedestrianInFront;//set to true if there is another pedestrian in front, this is used in order to avoid the pedestrian in front if there is one
     private bool shouldStop;//if set to true, this pedestrian has to stop (if he is in someone's personal space, but hasn't been in front of him first)
+    private bool alreadyWalking;//set to true if a pedestrian is allowed to move on in the moment of setting the new waypoint; used to prevent pedestrians to suddenly stop in the middle of the road because labels have changed in the meantime
     private Animator animator;//character animator used to set appropriate animations
     private int idleHash = Animator.StringToHash("Idle");//hash value of idle animation state; more efficient than string parsing every frame
-    private int walkHash = Animator.StringToHash("Walk");//hash value of walking animation state
-
-    public bool insertWayPointsManually;//if set to true, this pedestrian uses only the user defined waypoints, otherwise he uses both the user defined waypoints and the predefined ones
+    private int walkHash = Animator.StringToHash("Walk");//hash value of walking animation state   
+    
     public float rotationSpeed;//rotation speed
     public float walkSpeed;//movement speed
-    public Transform[] userDefinedWayPoints;//array of user defined waypoints
     
     /// <summary>
-    /// Determines what waypoints to use and sets the starting waypoint.
+    /// Sets the starting waypoint to be the neares one.
     /// </summary>
     void Start() {
-        currentPosition = 0;
-        if(insertWayPointsManually) {
-            sortUserWayPoints();
-        } else {
-            sortAllWayPoints();
+        allWaypoints = GameObject.FindGameObjectsWithTag("Waypoint");
+        Transform nearestWaypoint = allWaypoints[0].transform;
+        foreach(var wayPoint in allWaypoints) {
+            Transform wayPointTransform = wayPoint.transform;
+            if(Vector3.SqrMagnitude(wayPointTransform.position - transform.position) < Vector3.SqrMagnitude(nearestWaypoint.position - transform.position)) {
+                nearestWaypoint = wayPointTransform;
+            }
         }
-        currentWaypoint = wayPoints[0];
+        previousWaypoint = nearestWaypoint;
+        currentWaypoint = nearestWaypoint;
         isPedestrianInFront = false;
         shouldStop = false;
         animator = transform.Find("Character").GetComponent<Animator>();
         setAnimation(idleHash);
+        alreadyWalking = false;
     }
 
     /// <summary>
@@ -89,59 +93,12 @@ public class PedestrianController :MonoBehaviour {
     }
 
     /// <summary>
-    /// Fills an array of waypoints with manually inserted waypoints (predefined waypoints are not used).
-    /// </summary>
-    private void sortUserWayPoints() {
-        wayPoints = new Transform[userDefinedWayPoints.Length];
-        for(int i = 0; i < userDefinedWayPoints.Length; i++) {
-            wayPoints[i] = userDefinedWayPoints[i];
-        }
-    }
-
-    /// <summary>
-    /// Fills an array of waypoints with both user defined waypoints and predefined ones. 
-    /// Predefined waypoints are visited first, and user defined ones are visited after all the predefined ones have been visited.
-    /// Predefined waypoints are sorted lexicographically. User defined waypoints are not sorted.
-    /// </summary>
-    private void sortAllWayPoints() {
-        Transform wayPointsParent = transform.parent.Find("WayPoints");
-        Transform[] temporaryWayPoints = wayPointsParent.GetComponentsInChildren<Transform>();
-        wayPoints = new Transform[temporaryWayPoints.Length + userDefinedWayPoints.Length];
-        for(int i = 0; i < temporaryWayPoints.Length; i++) {
-            Transform minimum = temporaryWayPoints[i];
-            for(int j = i; j < temporaryWayPoints.Length; j++) {
-                if(string.Compare(temporaryWayPoints[j].name,  minimum.name) < 0) {
-                    minimum = temporaryWayPoints[j];
-                }
-                wayPoints[i] = minimum;
-            }
-        }
-        for(int i = 0; i < userDefinedWayPoints.Length; i++) {
-            wayPoints[i + temporaryWayPoints.Length] = userDefinedWayPoints[i];
-        }
-    }
-
-    /// <summary>
-    /// Sets the next waypoint. If the label of the next waypoint differs from the label of the current waypoint, 
-    /// the character waits (next waypoint is not set until its label changes to the adequate value); 
-    /// it is not allowed for pedestrians to move between waypoints with different labels (except if the label is equal to 0). 
-    /// If the label of current waypoint or the label of the next waypoint is equal to 0, the pedestrian is not forced to wait; 
-    /// pedestrians are allowed to move to waypoints with label equal to 0 or from them at any time.
+    /// Sets the current waypoint. The previous one becomes the current one.
     /// </summary>
     private void setNextWayPoint() {
-        int currentWaypointLabel = currentWaypoint.GetComponent<PointDescriptor>().getLabel();//label of the current waypoint
-        int nextWaypointLabel = currentPosition+1==wayPoints.Length ?
-                                wayPoints[0].GetComponent<PointDescriptor>().getLabel() :
-                                wayPoints[currentPosition + 1].GetComponent<PointDescriptor>().getLabel();//label of the next waypoint
-        if(currentWaypointLabel != nextWaypointLabel && currentWaypointLabel != 0 && nextWaypointLabel != 0) {//if you are not allowed to move on, wait
-            stop();
-            return;
-        }
-        currentPosition++;
-        if(currentPosition >= wayPoints.Length) {
-            currentPosition = 0;
-        }
-        currentWaypoint = wayPoints[currentPosition];
+        string previousWaypointName = previousWaypoint.name;
+        previousWaypoint = currentWaypoint;
+        currentWaypoint = currentWaypoint.GetComponent<PointDescriptor>().getAdjacentWaypoint(previousWaypointName);
     }
 
     /// <summary>
@@ -169,22 +126,48 @@ public class PedestrianController :MonoBehaviour {
     }
 
     /// <summary>
-    /// Moves the character towards the next waypoint and starts the walking animation.
+    /// Moves the character towards the next waypoint and starts the walking animation. If a pedestrian 
+    /// is not allowed to move, he stops. If he is not allowed to move, but has already started walking, 
+    /// he doesn't stop (for example, when the traffic light changes and a pedestrian is in the middle of 
+    /// the road - he will not stop in the middle of the road).
     /// </summary>
     private void walk() {
         float distanceToPoint = (currentWaypoint.position - transform.position).sqrMagnitude;//it is not necessary for character to reach the exact waypoint location
         if(distanceToPoint <= MINIMAL_DISTANCE_TO_POINT) {
             setNextWayPoint();
-            return;
+            alreadyWalking = allowedToWalk();
         }
+
+        if(!alreadyWalking) {
+            if(!allowedToWalk()) {
+                stop();
+                return;
+            } else {
+                alreadyWalking = true;
+            }
+        }
+
         setAnimation(walkHash);
         transform.Translate(Vector3.forward * Time.deltaTime * walkSpeed);
+    }
+
+    /// <summary>
+    /// Checks if a pedestrian is allowed to move to the next waypoint. The pedestrian will 
+    /// not be allowed to move to the next waypoint if labels of current and previous waypoints 
+    /// differ or at least one of them is not 0.
+    /// </summary>
+    /// <returns></returns>
+    private bool allowedToWalk() {
+        int previousWaypointLabel = previousWaypoint.GetComponent<PointDescriptor>().getLabel();
+        int currentWaypointLabel = currentWaypoint.GetComponent<PointDescriptor>().getLabel();
+        return !(currentWaypointLabel != previousWaypointLabel && currentWaypointLabel != 0 && previousWaypointLabel != 0);
     }
 
     /// <summary>
     /// Starts playing idle animation.
     /// </summary>
     private void stop() {
+        alreadyWalking = false;
         setAnimation(idleHash);
         return;
     }
