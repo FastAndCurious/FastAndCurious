@@ -144,62 +144,48 @@ public class MapPartController : MonoBehaviour {
             }          
         }
         Transform waypoints = transform.Find("WayPoints");
-        foreach(Transform waypoint in waypoints) {
+        foreach(Transform waypoint in waypoints) {         
             PointDescriptor pointScript = waypoint.GetComponent<PointDescriptor>();
-            switch(newLinkType) {
+            switch(thisLinkType) {
                 case "northLink":
                     if(pointScript.isNorthLink) {
-                        foreach(Transform newWaypoint in newWaypoints) {
-                            string point1FirstLabel = pointScript.firstLinkLabel;
-                            string point1SecondLabel = pointScript.secondLinkLabel;
-                            string point2FirstLabel = newWaypoint.GetComponent<PointDescriptor>().firstLinkLabel;
-                            string point2SecondLabel = newWaypoint.GetComponent<PointDescriptor>().secondLinkLabel;
-                            if((point1FirstLabel.Equals(point2FirstLabel) && !point1FirstLabel.Equals("") && !point2FirstLabel.Equals("")) || (point1SecondLabel.Equals(point2SecondLabel) && !point1SecondLabel.Equals("") && !point2SecondLabel.Equals(""))) {
-                                pointScript.addAdjacentWaypoint(newWaypoint);
-                            }
-                        }
+                        addNewWaypointsToCurrentOne(newWaypoints, pointScript);
                     }
                     break;
                 case "eastLink":
                     if(pointScript.isEastLink) {
-                        foreach(Transform newWaypoint in newWaypoints) {
-                            string point1FirstLabel = pointScript.firstLinkLabel;
-                            string point1SecondLabel = pointScript.secondLinkLabel;
-                            string point2FirstLabel = newWaypoint.GetComponent<PointDescriptor>().firstLinkLabel;
-                            string point2SecondLabel = newWaypoint.GetComponent<PointDescriptor>().secondLinkLabel;
-                            if((point1FirstLabel.Equals(point2FirstLabel) && !point1FirstLabel.Equals("") && !point2FirstLabel.Equals("")) || (point1SecondLabel.Equals(point2SecondLabel) && !point1SecondLabel.Equals("") && !point2SecondLabel.Equals(""))) {
-                                pointScript.addAdjacentWaypoint(newWaypoint);
-                            }
-                        }
+                        addNewWaypointsToCurrentOne(newWaypoints, pointScript);
                     }
                     break;
                 case "southLink":
                     if(pointScript.isSouthLink) {
-                        foreach(Transform newWaypoint in newWaypoints) {
-                            string point1FirstLabel = pointScript.firstLinkLabel;
-                            string point1SecondLabel = pointScript.secondLinkLabel;
-                            string point2FirstLabel = newWaypoint.GetComponent<PointDescriptor>().firstLinkLabel;
-                            string point2SecondLabel = newWaypoint.GetComponent<PointDescriptor>().secondLinkLabel;
-                            if((point1FirstLabel.Equals(point2FirstLabel) && !point1FirstLabel.Equals("") && !point2FirstLabel.Equals("")) || (point1SecondLabel.Equals(point2SecondLabel) && !point1SecondLabel.Equals("") && !point2SecondLabel.Equals(""))) {
-                                pointScript.addAdjacentWaypoint(newWaypoint);
-                            }
-                        }
+                        addNewWaypointsToCurrentOne(newWaypoints, pointScript);
                     }
                     break;
                 case "westLink":
                     if(pointScript.isWestLink) {
-                        foreach(Transform newWaypoint in newWaypoints) {
-                            string point1FirstLabel = pointScript.firstLinkLabel;
-                            string point1SecondLabel = pointScript.secondLinkLabel;
-                            string point2FirstLabel = newWaypoint.GetComponent<PointDescriptor>().firstLinkLabel;
-                            string point2SecondLabel = newWaypoint.GetComponent<PointDescriptor>().secondLinkLabel;
-                            if((point1FirstLabel.Equals(point2FirstLabel) && !point1FirstLabel.Equals("") && !point2FirstLabel.Equals("")) || (point1SecondLabel.Equals(point2SecondLabel) && !point1SecondLabel.Equals("") && !point2SecondLabel.Equals(""))) {
-                                pointScript.addAdjacentWaypoint(newWaypoint);
-                            }
-                        }
+                        addNewWaypointsToCurrentOne(newWaypoints, pointScript);
                     }
                     break;
             }          
+        }
+    }
+
+    /// <summary>
+    /// Links all of the waypoints from the list to the waypoint given as second parameter if at least 
+    /// one of their link labels match (it doesn't count if both labels are empty strings).
+    /// </summary>
+    /// <param name="newWaypoints">list of waypoints that will be added to the current waypoint</param>
+    /// <param name="pointScript">current waypoint, it will get references to all the waypoints from the list</param>
+    private static void addNewWaypointsToCurrentOne(List<Transform> newWaypoints, PointDescriptor pointScript) {
+        foreach(Transform newWaypoint in newWaypoints) {
+            string point1FirstLabel = pointScript.firstLinkLabel;
+            string point1SecondLabel = pointScript.secondLinkLabel;
+            string point2FirstLabel = newWaypoint.GetComponent<PointDescriptor>().firstLinkLabel;
+            string point2SecondLabel = newWaypoint.GetComponent<PointDescriptor>().secondLinkLabel;
+            if((point1FirstLabel.Equals(point2FirstLabel) && !point1FirstLabel.Equals("") && !point2FirstLabel.Equals("")) || (point1SecondLabel.Equals(point2SecondLabel) && !point1SecondLabel.Equals("") && !point2SecondLabel.Equals(""))) {
+                pointScript.addAdjacentWaypoint(newWaypoint);
+            }
         }
     }
 

@@ -14,7 +14,7 @@ public class GameController : MonoBehaviour {
         timer -= Time.deltaTime;
         if(timer <= 0 && !created) {
             created = true;
-            northPart = (Transform)Instantiate(MapPart, new Vector3(0, 0, 36), Quaternion.identity);//stvori novi komad mape (sjeverni)
+            northPart = (Transform)Instantiate(MapPart, new Vector3(0, 0, 35.95f), Quaternion.identity);//stvori novi komad mape (sjeverni)
             notifyParts();//obavijesti dijelove mape da su dobili susjedni dio
         }	
 	}
