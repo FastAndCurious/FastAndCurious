@@ -50,7 +50,8 @@ public class PlayerCarController : MonoBehaviour {
 	public void applyRotation()
 	{		
 		float steering = maxSteeringAngle * Input.GetAxis("Wheel");
-        steeringWheel.transform.rotation = new Quaternion (0, 0, -steering, 10);
+
+		steeringWheel.transform.localRotation = new Quaternion (0, 0, -steering, 50);
 
 		foreach (AxleInfo axleInfo in axleInfos) {
 			if (axleInfo.steering) {
