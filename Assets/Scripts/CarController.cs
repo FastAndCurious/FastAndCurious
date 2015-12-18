@@ -7,13 +7,11 @@ public class CarController : MonoBehaviour {
 	[SerializeField] private Vector3 centerOfMass = new Vector3(0, 0, 0);
 	[SerializeField] private float maxSteeringAngle = 30f;
 	[SerializeField] private float maxTorque = 1000f;
-	[Range(0, 1)] [SerializeField] private float traction = 0f;
 	[SerializeField] private float maxReverseTorque = 10f;
 	[SerializeField] private float maxBrakeTorque = 500f;
 	[SerializeField] private float downForce = 100f;
 	[SerializeField] private float topGearSpeed = 30;
 	[SerializeField] private int numberOfGears = 5;
-	[SerializeField] private float slipLimit = 0f;
 
 	[SerializeField] private GameObject steeringWheel = null;
 	[SerializeField] private Camera playerCamera = null;
@@ -24,7 +22,6 @@ public class CarController : MonoBehaviour {
 	private float currentTorque;
 	private Rigidbody rigidBody;
 	private float topSpeed;
-	// private float maxHandbrakeTorque = 0f;
 
 	public float BrakeInput { get; private set; }
 	public float CurrentSteerAngle{ get { return currentSteeringAngle; }}
@@ -34,9 +31,8 @@ public class CarController : MonoBehaviour {
 
 	void Start () {
 		wheelColliders [0].attachedRigidbody.centerOfMass = centerOfMass;
-		// maxHandbrakeTorque = float.MaxValue;
 		rigidBody = GetComponent<Rigidbody> ();
-		currentTorque = maxTorque - (traction * maxTorque);
+		currentTorque = maxTorque;
 	}
 
 	void FixedUpdate () {
@@ -57,7 +53,6 @@ public class CarController : MonoBehaviour {
 		applyDrive (accelerate, brake);
 		applyGearChanging(shift, gears);
 		addDownForce ();
-		tractionControl();
 		lookAround (camera);
 	}
 
@@ -129,30 +124,6 @@ public class CarController : MonoBehaviour {
 
 	void addDownForce() {
 		wheelColliders[0].attachedRigidbody.AddForce(- transform.up * downForce * wheelColliders[0].attachedRigidbody.velocity.magnitude);
-	}
-
-	void tractionControl() {
-		WheelHit wheelHit;
-		wheelColliders[0].GetGroundHit(out wheelHit);
-		adjustTorque(wheelHit.forwardSlip);
-		
-		wheelColliders[1].GetGroundHit(out wheelHit);
-		adjustTorque(wheelHit.forwardSlip);
-	}
-
-	void adjustTorque(float forwardSlip) {
-		if (forwardSlip >= slipLimit && currentTorque >= 0)
-		{
-			currentTorque -= 10 * traction;
-		}
-		else
-		{
-			currentTorque += 10 * traction;
-			if (currentTorque > maxTorque)
-			{
-				currentTorque = maxTorque;
-			}
-		}
 	}
 
 	void lookAround(float camera) {
