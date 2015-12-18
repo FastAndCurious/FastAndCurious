@@ -10,7 +10,6 @@ public class CarController : MonoBehaviour {
 	[Range(0, 1)] [SerializeField] private float traction = 0f;
 	[SerializeField] private float maxReverseTorque = 10f;
 	[SerializeField] private float maxBrakeTorque = 500f;
-	//[SerializeField] private float maxHandbrakeTorque = 0f;
 	[SerializeField] private float downForce = 100f;
 	[SerializeField] private float topGearSpeed = 30;
 	[SerializeField] private int numberOfGears = 5;
@@ -25,6 +24,7 @@ public class CarController : MonoBehaviour {
 	private float currentTorque;
 	private Rigidbody rigidBody;
 	private float topSpeed;
+	// private float maxHandbrakeTorque = 0f;
 
 	public float BrakeInput { get; private set; }
 	public float CurrentSteerAngle{ get { return currentSteeringAngle; }}
@@ -34,7 +34,7 @@ public class CarController : MonoBehaviour {
 
 	void Start () {
 		wheelColliders [0].attachedRigidbody.centerOfMass = centerOfMass;
-		//maxHandbrakeTorque = float.MaxValue;
+		// maxHandbrakeTorque = float.MaxValue;
 		rigidBody = GetComponent<Rigidbody> ();
 		currentTorque = maxTorque - (traction * maxTorque);
 	}
@@ -86,7 +86,7 @@ public class CarController : MonoBehaviour {
 			else if (brake > 0)
 			{
 				wheelColliders[i].brakeTorque = 0f;
-				wheelColliders[i].motorTorque = -maxReverseTorque*brake;
+				wheelColliders[i].motorTorque = - maxReverseTorque * brake;
 			}
 		}
 		capSpeed ();
@@ -94,7 +94,7 @@ public class CarController : MonoBehaviour {
 
 	void capSpeed() {
 		if (CurrentSpeed > topSpeed)
-			rigidBody.velocity = (topSpeed/3.6f) * rigidBody.velocity.normalized;
+			rigidBody.velocity = (topSpeed / 3.6f) * rigidBody.velocity.normalized;
 	}
 
 	void applyGearChanging(float shift, float gears) {
@@ -123,12 +123,12 @@ public class CarController : MonoBehaviour {
 	void calculateGearFactor()
 	{
 		float f = (1/(float) numberOfGears);
-		var targetGearFactor = Mathf.InverseLerp(f*currentGear, f*(currentGear + 1), Mathf.Abs(CurrentSpeed/topSpeed));
-		gearFactor = Mathf.Lerp(gearFactor, targetGearFactor, Time.deltaTime*5f);
+		var targetGearFactor = Mathf.InverseLerp(f * currentGear, f * (currentGear + 1), Mathf.Abs(CurrentSpeed/topSpeed));
+		gearFactor = Mathf.Lerp(gearFactor, targetGearFactor, Time.deltaTime * 5f);
 	}
 
 	void addDownForce() {
-		wheelColliders[0].attachedRigidbody.AddForce(-transform.up*downForce*wheelColliders[0].attachedRigidbody.velocity.magnitude);
+		wheelColliders[0].attachedRigidbody.AddForce(- transform.up * downForce * wheelColliders[0].attachedRigidbody.velocity.magnitude);
 	}
 
 	void tractionControl() {
