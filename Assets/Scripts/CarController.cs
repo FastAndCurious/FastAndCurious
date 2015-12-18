@@ -156,11 +156,13 @@ public class CarController : MonoBehaviour {
 	}
 
 	void lookAround(float camera) {
-		float viewAngle = 10;
+		float viewAngle = 0.5f;
 		if (camera > 0.0f)
-			playerCamera.transform.Rotate (new Vector3 (0, viewAngle, 0));
+			playerCamera.transform.localRotation = new Quaternion (0, viewAngle, 0, 1);
 		else if (camera < 0.0f)
-			playerCamera.transform.Rotate (new Vector3 (0, -viewAngle, 0));
+			playerCamera.transform.localRotation = new Quaternion (0, -viewAngle, 0, 1);
+		else
+			playerCamera.transform.localRotation = new Quaternion (0, 0, 0, 1);
 	}
 
 	void displayInfo() {
