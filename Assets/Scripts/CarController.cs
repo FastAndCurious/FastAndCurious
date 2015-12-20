@@ -23,11 +23,7 @@ public class CarController : MonoBehaviour {
 	private Rigidbody rigidBody;
 	private float topSpeed;
 
-	public float BrakeInput { get; private set; }
-	public float CurrentSteerAngle{ get { return currentSteeringAngle; }}
 	public float CurrentSpeed{ get { return rigidBody.velocity.magnitude * 3.6f; }}
-	public float Revs { get; private set; }
-	public float AccelInput { get; private set; }
 
 	void Start () {
 		wheelColliders [0].attachedRigidbody.centerOfMass = centerOfMass;
@@ -48,11 +44,9 @@ public class CarController : MonoBehaviour {
 	}
 
 	void controlCar(float accelerate, float steering, float brake, float shift, float camera, float gears) {
-		topSpeed = topGearSpeed * currentGear;
 		applySteering (steering);
 		applyDrive (accelerate, brake);
 		applyGearChanging(shift, gears);
-		addDownForce ();
 		lookAround (camera);
 	}
 
@@ -71,6 +65,7 @@ public class CarController : MonoBehaviour {
 	}
 
 	void applyDrive(float accelerate, float brake) {
+		topSpeed = topGearSpeed * currentGear;
 		wheelColliders[0].motorTorque = wheelColliders[1].motorTorque = accelerate * (currentTorque / 2f);
 		for (int i = 0; i < 4; i++)
 		{
@@ -84,12 +79,10 @@ public class CarController : MonoBehaviour {
 				wheelColliders[i].motorTorque = - maxReverseTorque * brake;
 			}
 		}
-		capSpeed ();
-	}
-
-	void capSpeed() {
 		if (CurrentSpeed > topSpeed)
 			rigidBody.velocity = (topSpeed / 3.6f) * rigidBody.velocity.normalized;
+
+		wheelColliders[0].attachedRigidbody.AddForce(- transform.up * downForce * wheelColliders[0].attachedRigidbody.velocity.magnitude);
 	}
 
 	void applyGearChanging(float shift, float gears) {
@@ -120,10 +113,6 @@ public class CarController : MonoBehaviour {
 		float f = (1/(float) numberOfGears);
 		var targetGearFactor = Mathf.InverseLerp(f * currentGear, f * (currentGear + 1), Mathf.Abs(CurrentSpeed/topSpeed));
 		gearFactor = Mathf.Lerp(gearFactor, targetGearFactor, Time.deltaTime * 5f);
-	}
-
-	void addDownForce() {
-		wheelColliders[0].attachedRigidbody.AddForce(- transform.up * downForce * wheelColliders[0].attachedRigidbody.velocity.magnitude);
 	}
 
 	void lookAround(float camera) {
