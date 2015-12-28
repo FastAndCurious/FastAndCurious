@@ -104,13 +104,18 @@ public class Cravler
 /// </summary>
 
 
-[InitializeOnLoad]
+
 public class WorldGenerator : MonoBehaviour
 {
-    public static readonly elementMape[][] mapa;            //opisuje prometnu povezanost grada
+    public GameObject ravniBlok, zavojBlok, tBlok, slijepiBlok, krizanjeBlok;
+    public float velicina_blokova;
+    public static elementMape[][] mapa;            //opisuje prometnu povezanost grada
+
+    private static GameObject[,] mapaBlokova;
     private static float[] vanjske_tocke;                   //vanjski obrub grada: -polarni zapis
     private static int[,] kartezijeve_tocke;                //                     -kartezijev zapis
     private static Queue<Cravler> cravler;                  //spremnik za cravlera
+    private static int velicina_mape = 128;
 
     private static elementMape[][] pomMapa;
     private static int max_x, max_y, min_x, min_y;
@@ -194,10 +199,10 @@ public class WorldGenerator : MonoBehaviour
                 mapa[i][j] = pomMapa[i][j];
     }
 
-    static WorldGenerator()
+    void Start()
     {
         // buduci argumenti poziva funkcije, a ne konstruktora
-        int velicina_mape = 128;
+        
         int pojavljivanje_avenije = velicina_mape / 10;
         if (pojavljivanje_avenije < 10)
             pojavljivanje_avenije = 10;
@@ -423,6 +428,8 @@ public class WorldGenerator : MonoBehaviour
 
         }
 
+        iscrtajMapu();
+
         // debug print
         string fileName = "debugIzlaz.txt"; 
 
@@ -475,5 +482,44 @@ public class WorldGenerator : MonoBehaviour
 
     }
 
+    private void iscrtajMapu()
+    {
+        mapaBlokova = new GameObject[velicina_mape, velicina_mape];
+        for (int i = 0; i < velicina_mape; i++)
+            for (int j = 0; j< velicina_mape; j++)
+            {
+                GameObject noviBlok;
+                Vector3 pomak = new Vector3((i - velicina_mape / 2) * velicina_blokova, 0, (j - velicina_mape / 2) * velicina_blokova);
+                Quaternion zakret ;
+                switch (mapa[i][j].id)
+                {
+                    case 1: noviBlok = slijepiBlok; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 2: noviBlok = slijepiBlok; zakret = Quaternion.Euler(0, 90, 0); break;
+                    case 3: noviBlok = zavojBlok; zakret = Quaternion.Euler(0, 90, 0); break;
+                    case 4: noviBlok = slijepiBlok; zakret = Quaternion.Euler(0, 180, 0); break;
+                    case 5: noviBlok = ravniBlok; zakret = Quaternion.Euler(0, 90, 0); break;
+                    case 6: noviBlok = zavojBlok; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 7: noviBlok = tBlok; zakret = Quaternion.Euler(0, 90, 0); break;
+                    case 8: noviBlok = slijepiBlok; zakret = Quaternion.Euler(0, 270, 0); break;
+                    case 9: noviBlok = zavojBlok; zakret = Quaternion.Euler(0, 180, 0); break;
+                    case 10: noviBlok = ravniBlok; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 11: noviBlok = tBlok; zakret = Quaternion.Euler(0, 180, 0); break;
+                    case 12: noviBlok = zavojBlok; zakret = Quaternion.Euler(0, 270, 0); break;
+                    case 13: noviBlok = tBlok; zakret = Quaternion.Euler(0, 270, 0); break;
+                    case 14: noviBlok = tBlok; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 15: noviBlok = krizanjeBlok; zakret = Quaternion.Euler(0, 0, 0); break;
 
+                    default:
+                        noviBlok = null;
+                        zakret = Quaternion.Euler(0, 0, 0);
+                        break;
+                }
+                if (noviBlok != null)
+                {
+                    GameObject ovaj = GameObject.Find("WG_SpawnPoint");
+                    mapaBlokova[i, j] = ((GameObject)GameObject.Instantiate(noviBlok, pomak, zakret));
+                    mapaBlokova[i, j].transform.parent = ovaj.transform;
+                }
+            }
+    }
 }
