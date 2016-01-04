@@ -2,20 +2,17 @@
 using System.Collections;
 
 /// <summary>
-/// Script used to manage character movement.
-/// Characters require waypoints to be able to move. They have the predefined waypoints, but can be ordered to use the user defined waypoints.
+/// Script used to manage car movement.
 /// </summary>
 public class AICarController :MonoBehaviour {
     private static GameObject[] allWaypoints;//array of all waypoints in the scene
-
-    private const float MINIMAL_DISTANCE_TO_POINT = 15f;//when the pedestrian is at this distance from waypoint, he will be considered to be at that waypoint; used to prevent characters to be at the same exact coordinates while waiting on a waypoint
+    private const float MINIMAL_DISTANCE_TO_POINT = 15f;//when the car is at this distance from waypoint, it will be considered to be at that waypoint; used to prevent cars to be at the same exact coordinates while waiting on a waypoint
     private Transform currentWaypoint;//current target waypoint
     private Transform previousWaypoint;//last visited waypoint
-    private bool isPedestrianInFront;//set to true if there is another pedestrian in front, this is used in order to avoid the pedestrian in front if there is one
-    private bool shouldStop;//if set to true, this pedestrian has to stop (if he is in someone's personal space, but hasn't been in front of him first)
-    private bool alreadyWalking;//set to true if a pedestrian is allowed to move on in the moment of setting the new waypoint; used to prevent pedestrians to suddenly stop in the middle of the road because labels have changed in the meantime
+    private bool isPedestrianInFront;//set to true if there is a pedestrian in front, this is used in order to stop on time
+    private bool alreadyDriving;//set to true if the car is allowed to move on in the moment of setting the new waypoint; used to prevent cars to suddenly stop in the middle of the road because labels have changed in the meantime
     private float currentRotationSpeed;
-    public float currentDrivingSpeed;
+    private float currentDrivingSpeed;
 
     public float maxRotationSpeed;//rotation speed
     public float maxDrivingSpeed;//movement speed
@@ -37,26 +34,19 @@ public class AICarController :MonoBehaviour {
         previousWaypoint = nearestWaypoint;
         currentWaypoint = nearestWaypoint;
         isPedestrianInFront = false;
-        shouldStop = false;
-        alreadyWalking = false;
+        alreadyDriving = false;
         currentDrivingSpeed = 0;
-        currentRotationSpeed = maxRotationSpeed;
+        setRotationSpeed();
     }
 
-    /// <summary>
-    /// Rotates and moves the character a little every frame.
-    /// </summary>
     void Update() {
-        if(isPedestrianInFront) {
-            avoidPedestrian();
+        if(shouldStop()) {
+            brake();
         } else {
-            if(shouldStop) {
-                brake();
-            } else {
-                rotate();
-            }
+            rotate();
+            accelerate();
         }
-        if(!shouldStop) drive();
+        drive();
     }
 
     /// <summary>
@@ -70,11 +60,6 @@ public class AICarController :MonoBehaviour {
         if(name == "FrontSpace" && other.tag == "Pedestrian") {
             isPedestrianInFront = true;
         }
-        if(name == "PersonalSpace") {
-            if(!isPedestrianInFront) {
-                shouldStop = true;
-            }
-        }
     }
 
     /// <summary>
@@ -87,9 +72,6 @@ public class AICarController :MonoBehaviour {
     public void triggerExit(string name, Collider other) {
         if(name == "FrontSpace" && other.tag == "Pedestrian") {
             isPedestrianInFront = false;
-        }
-        if(name == "PersonalSpace") {
-            shouldStop = false;
         }
     }
 
@@ -115,18 +97,6 @@ public class AICarController :MonoBehaviour {
     }
 
     /// <summary>
-    /// Rotates the character to the right in order to avoid the pedestrian in front.
-    /// </summary>
-    private void avoidPedestrian() {
-        Vector3 target = new Vector3(transform.position.x + transform.right.x, 0, transform.position.z + transform.forward.z);
-        Vector3 current = new Vector3(transform.position.x, 0, transform.position.z);
-        Vector3 targetDir = target - current;
-        float step = currentRotationSpeed * Time.deltaTime;//amount of degrees per second (step) depends on rotation speed
-        Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
-        transform.rotation = Quaternion.LookRotation(newDir);
-    }
-
-    /// <summary>
     /// Moves the character towards the next waypoint and starts the walking animation. If a pedestrian 
     /// is not allowed to move, he stops. If he is not allowed to move, but has already started walking, 
     /// he doesn't stop (for example, when the traffic light changes and a pedestrian is in the middle of 
@@ -136,19 +106,11 @@ public class AICarController :MonoBehaviour {
         float distanceToPoint = (currentWaypoint.position - transform.position).sqrMagnitude;//it is not necessary for character to reach the exact waypoint location
         if(distanceToPoint <= MINIMAL_DISTANCE_TO_POINT) {
             setNextWayPoint();
-            alreadyWalking = allowedToWalk();
+            alreadyDriving = allowedToWalk();
         }
 
-        if(!alreadyWalking) {
-            if(!allowedToWalk()) {
-                brake();
-                return;
-            } else {
-                alreadyWalking = true;
-            }
-        }
+        if(!alreadyDriving && allowedToWalk()) alreadyDriving = true;
 
-        accelerate();
         transform.Translate(Vector3.forward * Time.deltaTime * currentDrivingSpeed);
     }
 
@@ -165,11 +127,10 @@ public class AICarController :MonoBehaviour {
     }
 
     private void brake() {
-        alreadyWalking = false;
-        float deltaSpeed = -deceleration * Time.deltaTime;
-        currentDrivingSpeed = currentDrivingSpeed + deltaSpeed <= 0 ? 0 : currentDrivingSpeed + deltaSpeed;
+        alreadyDriving = false;
+        float deltaSpeed = deceleration * Time.deltaTime;
+        currentDrivingSpeed = currentDrivingSpeed - deltaSpeed <= 0 ? 0 : currentDrivingSpeed - deltaSpeed;
         setRotationSpeed();
-        return;
     }
 
     private void accelerate() {
@@ -180,6 +141,10 @@ public class AICarController :MonoBehaviour {
 
     private void setRotationSpeed() {
         currentRotationSpeed = maxRotationSpeed * currentDrivingSpeed / maxDrivingSpeed;
+    }
+
+    private bool shouldStop() {
+        return isPedestrianInFront || (!alreadyDriving && !allowedToWalk());
     }
 
 }
