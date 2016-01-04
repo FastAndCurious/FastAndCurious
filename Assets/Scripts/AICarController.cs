@@ -5,24 +5,25 @@ using System.Collections;
 /// Script used to manage character movement.
 /// Characters require waypoints to be able to move. They have the predefined waypoints, but can be ordered to use the user defined waypoints.
 /// </summary>
-public class PedestrianController :MonoBehaviour {
+public class AICarController :MonoBehaviour {
     private static GameObject[] allWaypoints;//array of all waypoints in the scene
 
-    private const float MINIMAL_DISTANCE_TO_POINT = 1f;//when the pedestrian is at this distance from waypoint, he will be considered to be at that waypoint; used to prevent characters to be at the same exact coordinates while waiting on a waypoint
+    private const float MINIMAL_DISTANCE_TO_POINT = 15f;//when the pedestrian is at this distance from waypoint, he will be considered to be at that waypoint; used to prevent characters to be at the same exact coordinates while waiting on a waypoint
     private Transform currentWaypoint;//current target waypoint
     private Transform previousWaypoint;//last visited waypoint
     private bool isPedestrianInFront;//set to true if there is another pedestrian in front, this is used in order to avoid the pedestrian in front if there is one
     private bool shouldStop;//if set to true, this pedestrian has to stop (if he is in someone's personal space, but hasn't been in front of him first)
     private bool alreadyWalking;//set to true if a pedestrian is allowed to move on in the moment of setting the new waypoint; used to prevent pedestrians to suddenly stop in the middle of the road because labels have changed in the meantime
-    private Animator animator;//character animator used to set appropriate animations
-    private int idleHash = Animator.StringToHash("Idle");//hash value of idle animation state; more efficient than string parsing every frame
-    private int walkHash = Animator.StringToHash("Walk");//hash value of walking animation state   
-    
-    public float rotationSpeed;//rotation speed
-    public float walkSpeed;//movement speed
-    
+    private float currentRotationSpeed;
+    public float currentDrivingSpeed;
+
+    public float maxRotationSpeed;//rotation speed
+    public float maxDrivingSpeed;//movement speed
+    public float acceleration;
+    public float deceleration;
+
     /// <summary>
-    /// Sets the starting waypoint to be the nearest one.
+    /// Sets the starting waypoint to be the neares one.
     /// </summary>
     void Start() {
         allWaypoints = GameObject.FindGameObjectsWithTag("Waypoint");
@@ -37,9 +38,9 @@ public class PedestrianController :MonoBehaviour {
         currentWaypoint = nearestWaypoint;
         isPedestrianInFront = false;
         shouldStop = false;
-        animator = transform.Find("Character").GetComponent<Animator>();
-        setAnimation(idleHash);
         alreadyWalking = false;
+        currentDrivingSpeed = 0;
+        currentRotationSpeed = maxRotationSpeed;
     }
 
     /// <summary>
@@ -50,12 +51,12 @@ public class PedestrianController :MonoBehaviour {
             avoidPedestrian();
         } else {
             if(shouldStop) {
-                stop();
+                brake();
             } else {
                 rotate();
             }
-        }                
-        if(!shouldStop) walk();
+        }
+        if(!shouldStop) drive();
     }
 
     /// <summary>
@@ -108,7 +109,7 @@ public class PedestrianController :MonoBehaviour {
         Vector3 target = new Vector3(currentWaypoint.position.x, 0, currentWaypoint.position.z);
         Vector3 current = new Vector3(transform.position.x, 0, transform.position.z);
         Vector3 targetDir = target - current;
-        float step = rotationSpeed * Time.deltaTime;//amount of degrees per second (step) depends on rotation speed
+        float step = currentRotationSpeed * Time.deltaTime;//amount of degrees per second (step) depends on rotation speed
         Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
         transform.rotation = Quaternion.LookRotation(newDir);
     }
@@ -120,7 +121,7 @@ public class PedestrianController :MonoBehaviour {
         Vector3 target = new Vector3(transform.position.x + transform.right.x, 0, transform.position.z + transform.forward.z);
         Vector3 current = new Vector3(transform.position.x, 0, transform.position.z);
         Vector3 targetDir = target - current;
-        float step = rotationSpeed * Time.deltaTime;//amount of degrees per second (step) depends on rotation speed
+        float step = currentRotationSpeed * Time.deltaTime;//amount of degrees per second (step) depends on rotation speed
         Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
         transform.rotation = Quaternion.LookRotation(newDir);
     }
@@ -131,7 +132,7 @@ public class PedestrianController :MonoBehaviour {
     /// he doesn't stop (for example, when the traffic light changes and a pedestrian is in the middle of 
     /// the road - he will not stop in the middle of the road).
     /// </summary>
-    private void walk() {
+    private void drive() {
         float distanceToPoint = (currentWaypoint.position - transform.position).sqrMagnitude;//it is not necessary for character to reach the exact waypoint location
         if(distanceToPoint <= MINIMAL_DISTANCE_TO_POINT) {
             setNextWayPoint();
@@ -140,15 +141,15 @@ public class PedestrianController :MonoBehaviour {
 
         if(!alreadyWalking) {
             if(!allowedToWalk()) {
-                stop();
+                brake();
                 return;
             } else {
                 alreadyWalking = true;
             }
         }
 
-        setAnimation(walkHash);
-        transform.Translate(Vector3.forward * Time.deltaTime * walkSpeed);
+        accelerate();
+        transform.Translate(Vector3.forward * Time.deltaTime * currentDrivingSpeed);
     }
 
     /// <summary>
@@ -163,21 +164,22 @@ public class PedestrianController :MonoBehaviour {
         return !(currentWaypointLabel != previousWaypointLabel && currentWaypointLabel != 0 && previousWaypointLabel != 0);
     }
 
-    /// <summary>
-    /// Starts playing idle animation.
-    /// </summary>
-    private void stop() {
+    private void brake() {
         alreadyWalking = false;
-        setAnimation(idleHash);
+        float deltaSpeed = -deceleration * Time.deltaTime;
+        currentDrivingSpeed = currentDrivingSpeed + deltaSpeed <= 0 ? 0 : currentDrivingSpeed + deltaSpeed;
+        setRotationSpeed();
         return;
     }
 
-    /// <summary>
-    /// Starts playing the requested animation.
-    /// </summary>
-    /// <param name="animationHash">Hash value of specified animation.</param>
-    private void setAnimation(int animationHash) {
-        animator.Play(animationHash);
+    private void accelerate() {
+        float deltaSpeed = acceleration * Time.deltaTime;
+        currentDrivingSpeed = currentDrivingSpeed + deltaSpeed >= maxDrivingSpeed ? maxDrivingSpeed : currentDrivingSpeed + deltaSpeed;
+        setRotationSpeed();
+    }
+
+    private void setRotationSpeed() {
+        currentRotationSpeed = maxRotationSpeed * currentDrivingSpeed / maxDrivingSpeed;
     }
 
 }
