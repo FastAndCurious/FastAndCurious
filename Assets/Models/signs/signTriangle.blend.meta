@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 1006b537a14b9de4ba25c70e92cd2ad7
-timeCreated: 1449832198
+guid: fb80d209336514a448bd17d9fecc3884
+timeCreated: 1452022126
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -9,7 +9,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: roadCurve
+    4300000: signTriangle
     7400000: Default Take
     9500000: //RootNode
   materials:

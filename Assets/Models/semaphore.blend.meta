@@ -1,15 +1,40 @@
 fileFormatVersion: 2
-guid: 1006b537a14b9de4ba25c70e92cd2ad7
-timeCreated: 1449832198
+guid: 8ac9d1324afe6e242ad3296b4e01f9c2
+timeCreated: 1451952686
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
-    100000: //RootNode
-    400000: //RootNode
-    2300000: //RootNode
-    3300000: //RootNode
-    4300000: roadCurve
+    100000: carGreen
+    100002: carRed
+    100004: carYellow
+    100006: pedestrianGreen
+    100008: pedestrianRed
+    100010: //RootNode
+    400000: carGreen
+    400002: carRed
+    400004: carYellow
+    400006: pedestrianGreen
+    400008: pedestrianRed
+    400010: //RootNode
+    2300000: carGreen
+    2300002: carRed
+    2300004: carYellow
+    2300006: pedestrianGreen
+    2300008: pedestrianRed
+    2300010: //RootNode
+    3300000: carGreen
+    3300002: carRed
+    3300004: carYellow
+    3300006: pedestrianGreen
+    3300008: pedestrianRed
+    3300010: //RootNode
+    4300000: semaphore
+    4300002: carGreen
+    4300004: carRed
+    4300006: carYellow
+    4300008: pedestrianGreen
+    4300010: pedestrianRed
     7400000: Default Take
     9500000: //RootNode
   materials:
