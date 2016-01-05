@@ -14,7 +14,7 @@ using System.Collections.Generic;
 public class PointDescriptor : MonoBehaviour {
     private static Dictionary<string, List<string>> dictionary;//dictionary that holds pairs of type (waypoint -> list of waypoints) where key waypoint is waypoint name and value list of waypoints is a list of waypoints that are connected to key waypoint
     private static System.Random indexGenerator;//generates a random index of a list; used to randomly chose one of the waypoints that are connected to this one
-    public int label = 0;//Pedestrians are allowed to move from current waypoint only to waypoints with the same label.    
+    private int label = 0;//Pedestrians are allowed to move from current waypoint only to waypoints with the same label.    
     private List<Transform> adjacentWaypoints;//list of waypoints that are accessible from this waypoint
 
     public Transform[] additionalAdjacentWaypoints;//array of manually inserted additional waypoints that are accessible from this waypoint    
@@ -25,33 +25,7 @@ public class PointDescriptor : MonoBehaviour {
     public string firstLinkLabel;//two waypoints can't be connected if at least one of their link labels doesn't match
     public string secondLinkLabel;
 
-    //Pedestrians scene
-    /* static PointDescriptor() {
-         indexGenerator = new System.Random();
-         dictionary = new Dictionary<string, List<string>>();
-         dictionary.Add("1", new List<string> { "2" });
-         dictionary.Add("2", new List<string> { "1", "3" });
-         dictionary.Add("3", new List<string> { "2" });
-         dictionary.Add("4", new List<string> { "5" });
-         dictionary.Add("5", new List<string> { "6", "4" });
-         dictionary.Add("6", new List<string> { "5" });
-         dictionary.Add("7", new List<string> { "8" });
-         dictionary.Add("8", new List<string> { "7", "9" , "13"});
-         dictionary.Add("9", new List<string> { "8" });
-         dictionary.Add("10", new List<string> { "11" });
-         dictionary.Add("11", new List<string> { "10", "12", "20"});
-         dictionary.Add("12", new List<string> { "11" });
-         dictionary.Add("13", new List<string> { "8" });
-         dictionary.Add("14", new List<string> { "15" });
-         dictionary.Add("15", new List<string> { "14", "16" });
-         dictionary.Add("16", new List<string> { "15" });
-         dictionary.Add("17", new List<string> { "18" });
-         dictionary.Add("18", new List<string> { "17", "19" });
-         dictionary.Add("19", new List<string> { "18" });
-         dictionary.Add("20", new List<string> { "11" });
-     }*/
-
-    //Cars scene
+    //Connects the waypoints.
     static PointDescriptor() {
         indexGenerator = new System.Random();
         dictionary = new Dictionary<string, List<string>>();

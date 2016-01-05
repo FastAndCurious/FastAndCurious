@@ -88,15 +88,26 @@ public class IntersectionController : MonoBehaviour {
     /// traffic light is green.
     /// </summary>
     private void manageAuxiliaryPoints() {
-        PointDescriptor carArrive1Point = transform.Find("AuxiliaryWaypoints").Find("carArrive1").GetComponent<PointDescriptor>();
-        PointDescriptor carArrive2Point = transform.Find("AuxiliaryWaypoints").Find("carArrive2").GetComponent<PointDescriptor>();
-        PointDescriptor carArrive3Point = transform.Find("AuxiliaryWaypoints").Find("carArrive3").GetComponent<PointDescriptor>();
-        PointDescriptor carArrive4Point = transform.Find("AuxiliaryWaypoints").Find("carArrive4").GetComponent<PointDescriptor>();
+        PointDescriptor carExit1Point = transform.Find("AuxiliaryWaypoints").Find("carExit1").GetComponent<PointDescriptor>();
+        PointDescriptor carExit2Point = transform.Find("AuxiliaryWaypoints").Find("carExit2").GetComponent<PointDescriptor>();
+        PointDescriptor carExit3Point = transform.Find("AuxiliaryWaypoints").Find("carExit3").GetComponent<PointDescriptor>();
+        PointDescriptor carExit4Point = transform.Find("AuxiliaryWaypoints").Find("carExit4").GetComponent<PointDescriptor>();
 
-        carArrive1Point.setLabel(POINT_STATE1);
-        carArrive2Point.setLabel(POINT_STATE1);
-        carArrive3Point.setLabel(POINT_STATE1);
-        carArrive4Point.setLabel(POINT_STATE1);
+
+        PointDescriptor carRight1Point = transform.Find("semaphore1").Find("carRight1").GetComponent<PointDescriptor>();
+        PointDescriptor carRight2Point = transform.Find("semaphore2").Find("carRight2").GetComponent<PointDescriptor>();
+        PointDescriptor carRight3Point = transform.Find("semaphore3").Find("carRight3").GetComponent<PointDescriptor>();
+        PointDescriptor carRight4Point = transform.Find("semaphore4").Find("carRight4").GetComponent<PointDescriptor>();
+
+        carExit1Point.setLabel(POINT_STATE1);
+        carExit2Point.setLabel(POINT_STATE1);
+        carExit3Point.setLabel(POINT_STATE1);
+        carExit4Point.setLabel(POINT_STATE1);
+
+        carRight1Point.setLabel(POINT_STATE1);
+        carRight2Point.setLabel(POINT_STATE1);
+        carRight3Point.setLabel(POINT_STATE1);
+        carRight4Point.setLabel(POINT_STATE1);
     }
 
     /// <summary>

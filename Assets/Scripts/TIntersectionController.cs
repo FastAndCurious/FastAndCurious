@@ -2,7 +2,7 @@
 using System.Collections;
 
 /// <summary>
-/// Controls the intersection semaphores. 
+/// Controls the T-intersection semaphores. 
 /// An intersection consists of two streets: vertical and horizontal. 
 /// An intersection can only be in four different states:
 ///     horizontal: cars and pedestrians are allowed to move in the horizontal street; 
@@ -88,13 +88,19 @@ public class TIntersectionController :MonoBehaviour {
     /// traffic light is green.
     /// </summary>
     private void manageAuxiliaryPoints() {
-        PointDescriptor carArrive1Point = transform.Find("AuxiliaryWaypoints").Find("carArrive1").GetComponent<PointDescriptor>();
-        PointDescriptor carArrive2Point = transform.Find("AuxiliaryWaypoints").Find("carArrive2").GetComponent<PointDescriptor>();
-        PointDescriptor carArrive4Point = transform.Find("AuxiliaryWaypoints").Find("carArrive4").GetComponent<PointDescriptor>();
+        PointDescriptor carExit1Point = transform.Find("AuxiliaryWaypoints").Find("carExit1").GetComponent<PointDescriptor>();
+        PointDescriptor carExit2Point = transform.Find("AuxiliaryWaypoints").Find("carExit2").GetComponent<PointDescriptor>();
+        PointDescriptor carExit4Point = transform.Find("AuxiliaryWaypoints").Find("carExit4").GetComponent<PointDescriptor>();
 
-        carArrive1Point.setLabel(POINT_STATE1);
-        carArrive2Point.setLabel(POINT_STATE1);
-        carArrive4Point.setLabel(POINT_STATE1);
+        PointDescriptor carRight1Point = transform.Find("semaphore1").Find("carRight1").GetComponent<PointDescriptor>();
+        PointDescriptor carRight2Point = transform.Find("semaphore2").Find("carRight2").GetComponent<PointDescriptor>();
+
+        carExit1Point.setLabel(POINT_STATE1);
+        carExit2Point.setLabel(POINT_STATE1);
+        carExit4Point.setLabel(POINT_STATE1);
+
+        carRight1Point.setLabel(POINT_STATE1);
+        carRight2Point.setLabel(POINT_STATE1);
     }
 
     /// <summary>
