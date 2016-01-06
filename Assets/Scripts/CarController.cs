@@ -126,6 +126,6 @@ public class CarController : MonoBehaviour {
 	}
 
 	void displayInfo() {
-		Debug.Log ("Gear: " + currentGear + "; Current speed = " + CurrentSpeed + "; Motor = " + gearFactor * 3000);
+		//Debug.Log ("Gear: " + currentGear + "; Current speed = " + CurrentSpeed + "; Motor = " + gearFactor * 3000);
 	}
 }
