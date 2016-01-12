@@ -11,8 +11,10 @@ public class AICarController :MonoBehaviour {
     private Transform previousWaypoint;//last visited waypoint
     private bool isPedestrianInFront;//set to true if there is a pedestrian in front, this is used in order to slow down on time
     private bool isAICarInFront;
+    private bool isPlayerCarInFront;
     private bool pedestrianTooClose;//if a pedestrian is really close, the car will stop
     private bool aiCarTooClose;
+    private bool playerCarTooClose;
     private bool alreadyDriving;//set to true if the car is allowed to move on in the moment of setting the new waypoint; used to prevent cars to suddenly stop in the middle of the road because labels have changed in the meantime
     private float currentRotationSpeed;
     private float currentDrivingSpeed;
@@ -38,9 +40,11 @@ public class AICarController :MonoBehaviour {
         currentWaypoint = nearestWaypoint;
         isPedestrianInFront = false;
         isAICarInFront = false;
+        isPlayerCarInFront = false;
         alreadyDriving = false;
         pedestrianTooClose = false;
         aiCarTooClose = false;
+        playerCarTooClose = false;
         currentDrivingSpeed = 0;
         setRotationSpeed();
     }
@@ -73,11 +77,17 @@ public class AICarController :MonoBehaviour {
         if(name == "FrontSpace" && other.tag == "AICar") {
             isAICarInFront = true;
         }
+        if(name == "FrontSpace" && other.tag == "PlayerCar") {
+            isPlayerCarInFront = true;
+        }
         if(name == "ProximitySpace" && other.tag == "Pedestrian") {
             pedestrianTooClose = true;
         }
         if(name == "ProximitySpace" && other.tag == "AICar") {
             aiCarTooClose = true;
+        }
+        if(name == "ProximitySpace" && other.tag == "PlayerCar") {
+            playerCarTooClose = true;
         }
     }
 
@@ -95,11 +105,17 @@ public class AICarController :MonoBehaviour {
         if(name == "FrontSpace" && other.tag == "AICar") {
             isAICarInFront = false;
         }
+        if(name == "FrontSpace" && other.tag == "PlayerCar") {
+            isPlayerCarInFront = false;
+        }
         if(name == "ProximitySpace" && other.tag == "Pedestrian") {
             pedestrianTooClose = false;
         }
         if(name == "ProximitySpace" && other.tag == "AICar") {
             aiCarTooClose = false;
+        }
+        if(name == "ProximitySpace" && other.tag == "PlayerCar") {
+            playerCarTooClose = false;
         }
     }
 
@@ -128,7 +144,8 @@ public class AICarController :MonoBehaviour {
     /// Moves the car towards the next waypoint.
     /// </summary>
     private void drive() {
-        float distanceToPoint = (currentWaypoint.position - transform.position).sqrMagnitude;//it is not necessary for character to reach the exact waypoint location
+        //float distanceToPoint = (currentWaypoint.position - transform.position).sqrMagnitude;//it is not necessary for character to reach the exact waypoint location
+        float distanceToPoint = (new Vector3(currentWaypoint.position.x, 0, currentWaypoint.position.z) - new Vector3(transform.position.x, 0, transform.position.z)).sqrMagnitude;//it is not necessary for the car to reach the exact waypoint location
         if(distanceToPoint <= MINIMAL_DISTANCE_TO_POINT) {
             setNextWayPoint();
             alreadyDriving = allowedToDrive();
@@ -182,7 +199,7 @@ public class AICarController :MonoBehaviour {
     /// </summary>
     /// <returns>true if the car is supposed to slow down, false otherwise</returns>
     private bool shouldSlowDown() {
-        return isPedestrianInFront || isAICarInFront || (!alreadyDriving && !allowedToDrive());
+        return isPedestrianInFront || isAICarInFront || isPlayerCarInFront || (!alreadyDriving && !allowedToDrive());
     }
 
     /// <summary>
@@ -190,7 +207,7 @@ public class AICarController :MonoBehaviour {
     /// </summary>
     /// <returns>true if the car must stop, false otherwise</returns>
     private bool shouldStop() {
-        return aiCarTooClose || pedestrianTooClose;
+        return pedestrianTooClose || playerCarTooClose;
     }
 
     /// <summary>

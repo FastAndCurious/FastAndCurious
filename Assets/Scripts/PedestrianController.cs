@@ -132,7 +132,7 @@ public class PedestrianController :MonoBehaviour {
     /// the road - he will not stop in the middle of the road).
     /// </summary>
     private void walk() {
-        float distanceToPoint = (currentWaypoint.position - transform.position).sqrMagnitude;//it is not necessary for character to reach the exact waypoint location
+        float distanceToPoint = (new Vector3(currentWaypoint.position.x, 0, currentWaypoint.position.z) - new Vector3(transform.position.x, 0, transform.position.z)).sqrMagnitude;//it is not necessary for character to reach the exact waypoint location
         if(distanceToPoint <= MINIMAL_DISTANCE_TO_POINT) {
             setNextWayPoint();
             alreadyWalking = allowedToWalk();
