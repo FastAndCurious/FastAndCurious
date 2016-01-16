@@ -22,25 +22,37 @@ public class CarCollider : MonoBehaviour {
         if (col.collider.tag == "Pedestrian")
         {
             col.collider.attachedRigidbody.AddForce(1, 1, 1000, ForceMode.Acceleration);
+            Renderer renderer = col.gameObject.transform.Find("Character").GetComponent<Renderer>();
+            Color color = renderer.material.color;
+            Color blink = Color.red;
 
-            StartCoroutine(Blink(col));
+            StartCoroutine(Blink(renderer, color, blink));
             
             pedestrianHit++;
-            
+
             Debug.Log("Hit a pedestrian!");
         }
 
         if(col.collider.tag == "Car")
         {
-            StartCoroutine(Blink(col));
+            Renderer renderer = col.gameObject.transform.Find("model").GetComponent<Renderer>();
+            Color color = renderer.material.color;
+            Color blink = Color.black;
+
+            StartCoroutine(Blink(renderer, color, blink));
            
             carHit++;
+            
             Debug.Log("Hit a car!");
         }
 
         if(col.collider.tag == "Wall")
         {
-            StartCoroutine(Blink(col));
+            Renderer renderer = col.gameObject.GetComponent<Renderer>();
+            Color color = renderer.material.color;
+            Color blink = Color.yellow;
+
+            StartCoroutine(Blink(renderer, color, blink));
 
             wallHit++;
             Debug.Log("Hit a wall!");
@@ -48,7 +60,11 @@ public class CarCollider : MonoBehaviour {
 
         if(col.collider.tag == "StreetObject")
         {
-            StartCoroutine(Blink(col));
+            Renderer renderer = col.gameObject.GetComponent<Renderer>();
+            Color color = renderer.material.color;
+            Color blink = Color.blue;
+
+            StartCoroutine(Blink(renderer, color, blink));
 
             streetObjectHit++;
             Debug.Log("Hit a street object!");
@@ -56,66 +72,22 @@ public class CarCollider : MonoBehaviour {
     }
 
    
-    IEnumerator Blink(Collision col)
+    IEnumerator Blink(Renderer renderer, Color color, Color blinkColor)
     {
        
         float blink = 0.1f;
-        GameObject ob = col.gameObject;
-        Renderer renderer;
-        if(col.collider.tag == "Car")
+
+        for (int i = 0; i < 3; i++)
         {
-            
-            renderer = ob.transform.Find("model").GetComponent<Renderer>();
-           
-            Color color = renderer.material.color;
-           
-            for (int i = 0; i < 3; i++)
-            {
 
-                renderer.material.SetColor("_Color", Color.black);
-                yield return new WaitForSeconds(blink);
+            renderer.material.SetColor("_Color", blinkColor);
+            yield return new WaitForSeconds(blink);
 
-                renderer.material.SetColor("_Color", color);
-                yield return new WaitForSeconds(blink);
-                
-            }
+            renderer.material.SetColor("_Color", color);
+            yield return new WaitForSeconds(blink);
 
-        }
-
-        if(col.collider.tag == "Pedestrian")
-        {
-            renderer = col.gameObject.transform.Find("Character").GetComponent<Renderer>();
-            Material material = renderer.material;
-            Color color = material.color;
-
-            for(int i = 0; i < 3; i++)
-            {
-                renderer.material.SetColor("_Color", Color.red);
-                yield return new WaitForSeconds(blink);
-
-                renderer.material.SetColor("_Color", color);
-                yield return new WaitForSeconds(blink);
-
-            }
-        }
-
-        if(col.collider.tag == "Wall")
-        {
-            renderer = col.gameObject.GetComponent<Renderer>();
-            Material material = renderer.material;
-            Color color = material.color;
-
-            for(int i = 0; i < 3; i++)
-            {
-                renderer.material.SetColor("_Color", Color.yellow);
-                yield return new WaitForSeconds(blink);
-
-                renderer.material.SetColor("_Color", color);
-                yield return new WaitForSeconds(blink);
-
-            }
         }
 
     }
-    
+
 }
