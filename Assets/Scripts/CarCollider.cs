@@ -24,7 +24,7 @@ public class CarCollider : MonoBehaviour {
         {
             Rigidbody rb = col.gameObject.GetComponent<Rigidbody>();
             rb.isKinematic = false;
-            col.collider.attachedRigidbody.AddForce(1, 1, 1000, ForceMode.Acceleration);
+            col.collider.attachedRigidbody.AddForce(1, 1, 500, ForceMode.Acceleration);
             //Renderer renderer = col.gameObject.transform.Find("Character").GetComponent<Renderer>();
             Renderer renderer = col.gameObject.transform.Find("Cube").GetComponent<Renderer>();
             Color color = renderer.material.color;
