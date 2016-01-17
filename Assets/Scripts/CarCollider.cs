@@ -18,11 +18,15 @@ public class CarCollider : MonoBehaviour {
 
 	void OnCollisionEnter(Collision col)
     {
-        
+
+        Debug.Log("tag name " + col.collider.tag);
         if (col.collider.tag == "Pedestrian")
         {
+            Rigidbody rb = col.gameObject.GetComponent<Rigidbody>();
+            rb.isKinematic = false;
             col.collider.attachedRigidbody.AddForce(1, 1, 1000, ForceMode.Acceleration);
-            Renderer renderer = col.gameObject.transform.Find("Character").GetComponent<Renderer>();
+            //Renderer renderer = col.gameObject.transform.Find("Character").GetComponent<Renderer>();
+            Renderer renderer = col.gameObject.transform.Find("Cube").GetComponent<Renderer>();
             Color color = renderer.material.color;
             Color blink = Color.red;
 
@@ -33,9 +37,10 @@ public class CarCollider : MonoBehaviour {
             Debug.Log("Hit a pedestrian!");
         }
 
-        if(col.collider.tag == "Car")
+        if(col.collider.tag == "AICar")
         {
-            Renderer renderer = col.gameObject.transform.Find("model").GetComponent<Renderer>();
+            //Renderer renderer = col.gameObject.transform.Find("model").GetComponent<Renderer>(); da je model kao glavni auto
+            Renderer renderer = col.gameObject.GetComponent<Renderer>();
             Color color = renderer.material.color;
             Color blink = Color.black;
 
@@ -87,6 +92,8 @@ public class CarCollider : MonoBehaviour {
             yield return new WaitForSeconds(blink);
 
         }
+
+        renderer.material.SetColor("_Color", color);
 
     }
 
