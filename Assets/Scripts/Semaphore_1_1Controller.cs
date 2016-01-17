@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class SemaphoreController : MonoBehaviour {
+public class Semaphore_1_1Controller : MonoBehaviour {
 
     public Color red;
     public Color yellow;
