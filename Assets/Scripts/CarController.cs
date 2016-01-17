@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class CarController : MonoBehaviour {
@@ -15,6 +16,7 @@ public class CarController : MonoBehaviour {
 
 	[SerializeField] private GameObject steeringWheel = null;
 	[SerializeField] private Camera playerCamera = null;
+	[SerializeField] private Text speedAndGearInfo = null;
 
 	private float currentSteeringAngle;
 	private int currentGear = 1;
@@ -102,17 +104,9 @@ public class CarController : MonoBehaviour {
 			}
 
 			if (currentGear == 0)
-				if (gears > 0f)
-					currentGear++;
+			if (gears > 0f)
+				currentGear++;
 		}
-		calculateGearFactor ();
-	}
-
-	void calculateGearFactor()
-	{
-		float f = (1/(float) numberOfGears);
-		var targetGearFactor = Mathf.InverseLerp(f * currentGear, f * (currentGear + 1), Mathf.Abs(CurrentSpeed/topSpeed));
-		gearFactor = Mathf.Lerp(gearFactor, targetGearFactor, Time.deltaTime * 5f);
 	}
 
 	void lookAround(float camera) {
@@ -126,6 +120,6 @@ public class CarController : MonoBehaviour {
 	}
 
 	void displayInfo() {
-		//Debug.Log ("Gear: " + currentGear + "; Current speed = " + CurrentSpeed + "; Motor = " + gearFactor * 3000);
+		speedAndGearInfo.text = "Speed: " + CurrentSpeed.ToString("0") + "\nGear: " + currentGear;
 	}
 }
