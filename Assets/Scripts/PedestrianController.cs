@@ -22,7 +22,7 @@ public class PedestrianController :MonoBehaviour {
     public float walkSpeed;//movement speed
     
     /// <summary>
-    /// Sets the starting waypoint to be the neares one.
+    /// Sets the starting waypoint to be the nearest one.
     /// </summary>
     void Start() {
         allWaypoints = GameObject.FindGameObjectsWithTag("Waypoint");

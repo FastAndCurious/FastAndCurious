@@ -36,6 +36,7 @@ public class IntersectionController : MonoBehaviour {
         if(lightDuration <= 0) lightDuration = 10;
         if(transitionDuration <= 0) transitionDuration = 2;
         if(currentState == 0) currentState = VERTICAL;
+        manageAuxiliaryPoints();
         timer = currentState == HORIZONTAL || currentState == VERTICAL ? lightDuration : transitionDuration;      
         switch(currentState) {
             case VERTICAL:
@@ -83,6 +84,33 @@ public class IntersectionController : MonoBehaviour {
 	}
 
     /// <summary>
+    /// Sets labels of auxiliary waypoints to 1. This means that the cars can reach them only if the 
+    /// traffic light is green.
+    /// </summary>
+    private void manageAuxiliaryPoints() {
+        PointDescriptor carExit1Point = transform.Find("AuxiliaryWaypoints").Find("carExit1").GetComponent<PointDescriptor>();
+        PointDescriptor carExit2Point = transform.Find("AuxiliaryWaypoints").Find("carExit2").GetComponent<PointDescriptor>();
+        PointDescriptor carExit3Point = transform.Find("AuxiliaryWaypoints").Find("carExit3").GetComponent<PointDescriptor>();
+        PointDescriptor carExit4Point = transform.Find("AuxiliaryWaypoints").Find("carExit4").GetComponent<PointDescriptor>();
+
+
+        PointDescriptor carRight1Point = transform.Find("semaphore1").Find("carRight1").GetComponent<PointDescriptor>();
+        PointDescriptor carRight2Point = transform.Find("semaphore2").Find("carRight2").GetComponent<PointDescriptor>();
+        PointDescriptor carRight3Point = transform.Find("semaphore3").Find("carRight3").GetComponent<PointDescriptor>();
+        PointDescriptor carRight4Point = transform.Find("semaphore4").Find("carRight4").GetComponent<PointDescriptor>();
+
+        carExit1Point.setLabel(POINT_STATE1);
+        carExit2Point.setLabel(POINT_STATE1);
+        carExit3Point.setLabel(POINT_STATE1);
+        carExit4Point.setLabel(POINT_STATE1);
+
+        carRight1Point.setLabel(POINT_STATE1);
+        carRight2Point.setLabel(POINT_STATE1);
+        carRight3Point.setLabel(POINT_STATE1);
+        carRight4Point.setLabel(POINT_STATE1);
+    }
+
+    /// <summary>
     /// Sets the intersection to a new state. (sets appropriate waypoint labels and changes lights). 
     /// </summary>
     /// <param name="newState">Parameter which sets this intersection either to the new state.</param>
@@ -109,6 +137,40 @@ public class IntersectionController : MonoBehaviour {
         }
         currentState = newState;
         changeLights(currentState);
+        manageDecelerationPoints(currentState);
+    }
+
+    /// <summary>
+    /// Changes label states of points whose name begins with "carDecelerate". This allows the cars 
+    /// to move when the light is green and orders them to stop when it is red.
+    /// </summary>
+    /// <param name="newState">New intersection state</param>
+    private void manageDecelerationPoints(int newState) {
+        PointDescriptor carDecelerate1Descriptor = transform.Find("semaphore1").Find("carDecelerate1").GetComponent<PointDescriptor>();
+        PointDescriptor carDecelerate2Descriptor = transform.Find("semaphore2").Find("carDecelerate2").GetComponent<PointDescriptor>();
+        PointDescriptor carDecelerate3Descriptor = transform.Find("semaphore3").Find("carDecelerate3").GetComponent<PointDescriptor>();
+        PointDescriptor carDecelerate4Descriptor = transform.Find("semaphore4").Find("carDecelerate4").GetComponent<PointDescriptor>();
+
+        switch(newState) {
+            case VERTICAL:
+                carDecelerate1Descriptor.setLabel(POINT_STATE1);
+                carDecelerate2Descriptor.setLabel(POINT_STATE2);
+                carDecelerate3Descriptor.setLabel(POINT_STATE1);
+                carDecelerate4Descriptor.setLabel(POINT_STATE2);
+                break;
+            case HORIZONTAL:
+                carDecelerate1Descriptor.setLabel(POINT_STATE2);
+                carDecelerate2Descriptor.setLabel(POINT_STATE1);
+                carDecelerate3Descriptor.setLabel(POINT_STATE2);
+                carDecelerate4Descriptor.setLabel(POINT_STATE1);
+                break;
+            default:
+                carDecelerate1Descriptor.setLabel(POINT_STATE2);
+                carDecelerate2Descriptor.setLabel(POINT_STATE2);
+                carDecelerate3Descriptor.setLabel(POINT_STATE2);
+                carDecelerate4Descriptor.setLabel(POINT_STATE2);
+                break;
+        }
     }
 
     /// <summary>
