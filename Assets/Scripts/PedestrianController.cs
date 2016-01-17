@@ -17,10 +17,10 @@ public class PedestrianController :MonoBehaviour {
     private Animator animator;//character animator used to set appropriate animations
     private int idleHash = Animator.StringToHash("Idle");//hash value of idle animation state; more efficient than string parsing every frame
     private int walkHash = Animator.StringToHash("Walk");//hash value of walking animation state   
-    
+
     public float rotationSpeed;//rotation speed
     public float walkSpeed;//movement speed
-    
+
     /// <summary>
     /// Sets the starting waypoint to be the nearest one.
     /// </summary>
@@ -54,7 +54,7 @@ public class PedestrianController :MonoBehaviour {
             } else {
                 rotate();
             }
-        }                
+        }
         if(!shouldStop) walk();
     }
 

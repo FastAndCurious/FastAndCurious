@@ -10,7 +10,7 @@ using System.Collections.Generic;
 /// is generated, this script's setNorthPart method has to be called. The argument to this method 
 /// should be reference to a MapPartController script that belongs to the new map part.
 /// </summary>
-public class MapPartController : MonoBehaviour {
+public class MapPartController :MonoBehaviour {
     private MapPartController northPart = null;//north adjacent map part
     private MapPartController eastPart = null;//east adjacent map part
     private MapPartController southPart = null;//south adjacent map part
@@ -141,10 +141,10 @@ public class MapPartController : MonoBehaviour {
                         newWaypoints.Add(waypoint);
                     }
                     break;
-            }          
+            }
         }
         Transform waypoints = transform.Find("WayPoints");
-        foreach(Transform waypoint in waypoints) {         
+        foreach(Transform waypoint in waypoints) {
             PointDescriptor pointScript = waypoint.GetComponent<PointDescriptor>();
             switch(thisLinkType) {
                 case "northLink":
@@ -167,7 +167,7 @@ public class MapPartController : MonoBehaviour {
                         addNewWaypointsToCurrentOne(newWaypoints, pointScript);
                     }
                     break;
-            }          
+            }
         }
     }
 

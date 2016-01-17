@@ -24,6 +24,11 @@ public class TIntersectionController :MonoBehaviour {
     private const int POINT_STATE1 = 1;//label of the waypoint; used to determine where is the pedestrian allowed to go from current point
     private const int POINT_STATE2 = 2;
     private float timer;
+    private Transform waypoints;
+    private Semaphore_1_2Controller semaphore1;
+    private Semaphore_1_2Controller semaphore2;
+    private Semaphore_0_1Controller semaphore3;
+    private Semaphore_1_1Controller semaphore4;
 
     public int currentState;//starting state of the intersection
     public float lightDuration;//time between the red and green lights
@@ -33,11 +38,20 @@ public class TIntersectionController :MonoBehaviour {
     /// Determines the starting state.
     /// </summary>
     void Start() {
+        waypoints = transform.Find("Waypoints");
+        semaphore1 = transform.Find("semaphore1").GetComponent<Semaphore_1_2Controller>();
+        semaphore2 = transform.Find("semaphore2").GetComponent<Semaphore_1_2Controller>();
+        semaphore3 = transform.Find("semaphore3").GetComponent<Semaphore_0_1Controller>();
+        semaphore4 = transform.Find("semaphore4").GetComponent<Semaphore_1_1Controller>();
+
         if(lightDuration <= 0) lightDuration = 10;
         if(transitionDuration <= 0) transitionDuration = 2;
         if(currentState == 0) currentState = VERTICAL;
-        manageAuxiliaryPoints();
+
+        manageExitAndRightPoints();
+
         timer = currentState == HORIZONTAL || currentState == VERTICAL ? lightDuration : transitionDuration;
+
         switch(currentState) {
             case VERTICAL:
                 switchState(VERTICAL);
@@ -87,13 +101,14 @@ public class TIntersectionController :MonoBehaviour {
     /// Sets labels of auxiliary waypoints to 1. This means that the cars can reach them only if the 
     /// traffic light is green.
     /// </summary>
-    private void manageAuxiliaryPoints() {
-        PointDescriptor carExit1Point = transform.Find("AuxiliaryWaypoints").Find("carExit1").GetComponent<PointDescriptor>();
-        PointDescriptor carExit2Point = transform.Find("AuxiliaryWaypoints").Find("carExit2").GetComponent<PointDescriptor>();
-        PointDescriptor carExit4Point = transform.Find("AuxiliaryWaypoints").Find("carExit4").GetComponent<PointDescriptor>();
+    private void manageExitAndRightPoints() {
+        PointDescriptor carExit1Point = waypoints.Find("carExit1").GetComponent<PointDescriptor>();
+        PointDescriptor carExit2Point = waypoints.Find("carExit2").GetComponent<PointDescriptor>();
+        PointDescriptor carExit4Point = waypoints.Find("carExit4").GetComponent<PointDescriptor>();
 
-        PointDescriptor carRight1Point = transform.Find("semaphore1").Find("carRight1").GetComponent<PointDescriptor>();
-        PointDescriptor carRight2Point = transform.Find("semaphore2").Find("carRight2").GetComponent<PointDescriptor>();
+
+        PointDescriptor carRight1Point = waypoints.Find("carRight1").GetComponent<PointDescriptor>();
+        PointDescriptor carRight2Point = waypoints.Find("carRight2").GetComponent<PointDescriptor>();
 
         carExit1Point.setLabel(POINT_STATE1);
         carExit2Point.setLabel(POINT_STATE1);
@@ -108,10 +123,10 @@ public class TIntersectionController :MonoBehaviour {
     /// </summary>
     /// <param name="newState">Parameter which sets this intersection either to the new state.</param>
     private void switchState(int newState) {
-        PointDescriptor point1Descriptor = transform.Find("semaphore1").Find("point1").GetComponent<PointDescriptor>();
-        PointDescriptor point2Descriptor = transform.Find("semaphore2").Find("point2").GetComponent<PointDescriptor>();
-        PointDescriptor point3Descriptor = transform.Find("semaphore3").Find("point3").GetComponent<PointDescriptor>();
-        PointDescriptor point4Descriptor = transform.Find("semaphore4").Find("point4").GetComponent<PointDescriptor>();
+        PointDescriptor point1Descriptor = waypoints.Find("point1").GetComponent<PointDescriptor>();
+        PointDescriptor point2Descriptor = waypoints.Find("point2").GetComponent<PointDescriptor>();
+        PointDescriptor point3Descriptor = waypoints.Find("point3").GetComponent<PointDescriptor>();
+        PointDescriptor point4Descriptor = waypoints.Find("point4").GetComponent<PointDescriptor>();
         switch(newState) {
             case VERTICAL:
             case VERTICAL_TO_HORIZONTAL:
@@ -139,9 +154,9 @@ public class TIntersectionController :MonoBehaviour {
     /// </summary>
     /// <param name="newState">New intersection state</param>
     private void manageDecelerationPoints(int newState) {
-        PointDescriptor carDecelerate1Descriptor = transform.Find("semaphore1").Find("carDecelerate1").GetComponent<PointDescriptor>();
-        PointDescriptor carDecelerate2Descriptor = transform.Find("semaphore2").Find("carDecelerate2").GetComponent<PointDescriptor>();
-        PointDescriptor carDecelerate4Descriptor = transform.Find("semaphore4").Find("carDecelerate4").GetComponent<PointDescriptor>();
+        PointDescriptor carDecelerate1Descriptor = waypoints.Find("carDecelerate1").GetComponent<PointDescriptor>();
+        PointDescriptor carDecelerate2Descriptor = waypoints.Find("carDecelerate2").GetComponent<PointDescriptor>();
+        PointDescriptor carDecelerate4Descriptor = waypoints.Find("carDecelerate4").GetComponent<PointDescriptor>();
 
         switch(newState) {
             case VERTICAL:
@@ -195,45 +210,38 @@ public class TIntersectionController :MonoBehaviour {
     /// Sets the lights so that cars are free to move in the vertical street.
     /// </summary>
     private void setCarLightsToVertical() {
-        Transform semaphore1 = transform.Find("semaphore1");
-        semaphore1.Find("carGreen").GetComponent<MeshRenderer>().enabled = true;
-        semaphore1.Find("carRed").GetComponent<MeshRenderer>().enabled = false;
-        semaphore1.Find("carYellow").GetComponent<MeshRenderer>().enabled = false;
+        semaphore1.carGreen = true;
+        semaphore1.carYellow = false;
+        semaphore1.carRed = false;
 
-        Transform semaphore2 = transform.Find("semaphore2");
-        semaphore2.Find("carGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore2.Find("carRed").GetComponent<MeshRenderer>().enabled = true;
-        semaphore2.Find("carYellow").GetComponent<MeshRenderer>().enabled = false;
+        semaphore2.carGreen = false;
+        semaphore2.carYellow = false;
+        semaphore2.carRed = true;
 
-        Transform semaphore4 = transform.Find("semaphore4");
-        semaphore4.Find("carGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore4.Find("carRed").GetComponent<MeshRenderer>().enabled = true;
-        semaphore4.Find("carYellow").GetComponent<MeshRenderer>().enabled = false;
+        semaphore4.carGreen = false;
+        semaphore4.carYellow = false;
+        semaphore4.carRed = true;
     }
 
     /// <summary>
     ///  Sets the lights so that pedestrians are free to move in the vertical street.
     /// </summary>
     private void setPedestrianLightsToVertical() {
-        Transform semaphore1 = transform.Find("semaphore1");
-        semaphore1.Find("pedestrianVerticalGreen").GetComponent<MeshRenderer>().enabled = true;
-        semaphore1.Find("pedestrianVerticalRed").GetComponent<MeshRenderer>().enabled = false;
-        semaphore1.Find("pedestrianHorizontalGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore1.Find("pedestrianHorizontalRed").GetComponent<MeshRenderer>().enabled = true;
+        semaphore1.pedestrianVerticalGreen = true;
+        semaphore1.pedestrianVerticalRed = false;
+        semaphore1.pedestrianHorizontalGreen = false;
+        semaphore1.pedestrianHorizontalRed = true;
 
-        Transform semaphore2 = transform.Find("semaphore2");
-        semaphore2.Find("pedestrianVerticalGreen").GetComponent<MeshRenderer>().enabled = true;
-        semaphore2.Find("pedestrianVerticalRed").GetComponent<MeshRenderer>().enabled = false;
-        semaphore2.Find("pedestrianHorizontalGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore2.Find("pedestrianHorizontalRed").GetComponent<MeshRenderer>().enabled = true;
+        semaphore2.pedestrianVerticalGreen = false;
+        semaphore2.pedestrianVerticalRed = true;
+        semaphore2.pedestrianHorizontalGreen = true;
+        semaphore2.pedestrianHorizontalRed = false;
 
-        Transform semaphore3 = transform.Find("semaphore3");
-        semaphore3.Find("pedestrianVerticalGreen").GetComponent<MeshRenderer>().enabled = true;
-        semaphore3.Find("pedestrianVerticalRed").GetComponent<MeshRenderer>().enabled = false;
+        semaphore3.pedestrianGreen = true;
+        semaphore3.pedestrianRed = false;
 
-        Transform semaphore4 = transform.Find("semaphore4");
-        semaphore4.Find("pedestrianVerticalGreen").GetComponent<MeshRenderer>().enabled = true;
-        semaphore4.Find("pedestrianVerticalRed").GetComponent<MeshRenderer>().enabled = false;
+        semaphore4.pedestrianGreen = true;
+        semaphore4.pedestrianRed = false;
     }
 
     /// <summary>
@@ -248,84 +256,71 @@ public class TIntersectionController :MonoBehaviour {
     ///  Sets the lights so that cars are free to move in the horizontal street.
     /// </summary>
     private void setCarLightsToHorizontal() {
-        Transform semaphore1 = transform.Find("semaphore1");
-        semaphore1.Find("carGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore1.Find("carRed").GetComponent<MeshRenderer>().enabled = true;
-        semaphore1.Find("carYellow").GetComponent<MeshRenderer>().enabled = false;
+        semaphore1.carGreen = false;
+        semaphore1.carYellow = false;
+        semaphore1.carRed = true;
 
-        Transform semaphore2 = transform.Find("semaphore2");
-        semaphore2.Find("carGreen").GetComponent<MeshRenderer>().enabled = true;
-        semaphore2.Find("carRed").GetComponent<MeshRenderer>().enabled = false;
-        semaphore2.Find("carYellow").GetComponent<MeshRenderer>().enabled = false;
+        semaphore2.carGreen = true;
+        semaphore2.carYellow = false;
+        semaphore2.carRed = false;
 
-        Transform semaphore4 = transform.Find("semaphore4");
-        semaphore4.Find("carGreen").GetComponent<MeshRenderer>().enabled = true;
-        semaphore4.Find("carRed").GetComponent<MeshRenderer>().enabled = false;
-        semaphore4.Find("carYellow").GetComponent<MeshRenderer>().enabled = false;
+        semaphore4.carGreen = true;
+        semaphore4.carYellow = false;
+        semaphore4.carRed = false;
     }
 
     /// <summary>
     /// Sets the lights so that pedestrians are free to move in the horizontal street.
     /// </summary>
     private void setPedestrianLightsToHorizontal() {
-        Transform semaphore1 = transform.Find("semaphore1");
-        semaphore1.Find("pedestrianVerticalGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore1.Find("pedestrianVerticalRed").GetComponent<MeshRenderer>().enabled = true;
-        semaphore1.Find("pedestrianHorizontalGreen").GetComponent<MeshRenderer>().enabled = true;
-        semaphore1.Find("pedestrianHorizontalRed").GetComponent<MeshRenderer>().enabled = false;
+        semaphore1.pedestrianVerticalGreen = false;
+        semaphore1.pedestrianVerticalRed = true;
+        semaphore1.pedestrianHorizontalGreen = true;
+        semaphore1.pedestrianHorizontalRed = false;
 
-        Transform semaphore2 = transform.Find("semaphore2");
-        semaphore2.Find("pedestrianVerticalGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore2.Find("pedestrianVerticalRed").GetComponent<MeshRenderer>().enabled = true;
-        semaphore2.Find("pedestrianHorizontalGreen").GetComponent<MeshRenderer>().enabled = true;
-        semaphore2.Find("pedestrianHorizontalRed").GetComponent<MeshRenderer>().enabled = false;
+        semaphore2.pedestrianVerticalGreen = true;
+        semaphore2.pedestrianVerticalRed = false;
+        semaphore2.pedestrianHorizontalGreen = false;
+        semaphore2.pedestrianHorizontalRed = true;
 
-        Transform semaphore3 = transform.Find("semaphore3");
-        semaphore3.Find("pedestrianVerticalGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore3.Find("pedestrianVerticalRed").GetComponent<MeshRenderer>().enabled = true;
+        semaphore3.pedestrianGreen = false;
+        semaphore3.pedestrianRed = true;
 
-        Transform semaphore4 = transform.Find("semaphore4");
-        semaphore4.Find("pedestrianVerticalGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore4.Find("pedestrianVerticalRed").GetComponent<MeshRenderer>().enabled = true;
+        semaphore4.pedestrianGreen = false;
+        semaphore4.pedestrianRed = true;
     }
 
     /// <summary>
     /// Manges yellow traffic lights so that they match the current intersection state (VERTICAL_TO_HORIZONTAL).
     /// </summary>
     private void setLigtsToVerticalToHorizontal() {
-        Transform semaphore1 = transform.Find("semaphore1");
-        semaphore1.Find("carGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore1.Find("carRed").GetComponent<MeshRenderer>().enabled = false;
-        semaphore1.Find("carYellow").GetComponent<MeshRenderer>().enabled = true;
+        semaphore1.carGreen = false;
+        semaphore1.carYellow = true;
+        semaphore1.carRed = false;
 
-        Transform semaphore2 = transform.Find("semaphore2");
-        semaphore2.Find("carGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore2.Find("carRed").GetComponent<MeshRenderer>().enabled = true;
-        semaphore2.Find("carYellow").GetComponent<MeshRenderer>().enabled = true;
+        semaphore2.carGreen = false;
+        semaphore2.carYellow = true;
+        semaphore2.carRed = true;
 
-        Transform semaphore4 = transform.Find("semaphore4");
-        semaphore4.Find("carGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore4.Find("carRed").GetComponent<MeshRenderer>().enabled = true;
-        semaphore4.Find("carYellow").GetComponent<MeshRenderer>().enabled = true;
+        semaphore4.carGreen = false;
+        semaphore4.carYellow = true;
+        semaphore4.carRed = true;
     }
 
     /// <summary>
     /// Manges yellow traffic lights so that they match the current intersection state (HORIZONTAL_TO_VERTICAL).
     /// </summary>
     private void setLightsToHorizontalToVertical() {
-        Transform semaphore1 = transform.Find("semaphore1");
-        semaphore1.Find("carGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore1.Find("carRed").GetComponent<MeshRenderer>().enabled = true;
-        semaphore1.Find("carYellow").GetComponent<MeshRenderer>().enabled = true;
+        semaphore1.carGreen = false;
+        semaphore1.carYellow = true;
+        semaphore1.carRed = true;
 
-        Transform semaphore2 = transform.Find("semaphore2");
-        semaphore2.Find("carGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore2.Find("carRed").GetComponent<MeshRenderer>().enabled = false;
-        semaphore2.Find("carYellow").GetComponent<MeshRenderer>().enabled = true;
+        semaphore2.carGreen = false;
+        semaphore2.carYellow = true;
+        semaphore2.carRed = false;
 
-        Transform semaphore4 = transform.Find("semaphore4");
-        semaphore4.Find("carGreen").GetComponent<MeshRenderer>().enabled = false;
-        semaphore4.Find("carRed").GetComponent<MeshRenderer>().enabled = false;
-        semaphore4.Find("carYellow").GetComponent<MeshRenderer>().enabled = true;
+        semaphore4.carGreen = false;
+        semaphore4.carYellow = true;
+        semaphore4.carRed = false;
     }
 }
