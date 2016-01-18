@@ -20,7 +20,7 @@ public class CarCollider : MonoBehaviour {
 
     void OnCollisionEnter(Collision col)
     {
-        Debug.Log("tag name " + col.collider.tag);
+        //Debug.Log("tag name " + col.collider.tag);
         if (col.collider.tag == "Pedestrian")
         {
             
@@ -40,12 +40,13 @@ public class CarCollider : MonoBehaviour {
             AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
             crashSound = sounds[2];
             StartCoroutine(PlaySound(crashSound));
-
+            crashSound = sounds[4];
+            StartCoroutine(PlaySound(crashSound));
             StartCoroutine(Blink(renderer, color, blink));
             
             pedestrianHit++;
 
-            Debug.Log("Hit a pedestrian!");
+            //Debug.Log("Hit a pedestrian!");
         }
 
         if(col.collider.tag == "AICar")
@@ -70,7 +71,7 @@ public class CarCollider : MonoBehaviour {
            
             carHit++;
             
-            Debug.Log("Hit a car!");
+            //Debug.Log("Hit a car!");
         }
 
         if(col.collider.tag == "Wall")
@@ -87,7 +88,7 @@ public class CarCollider : MonoBehaviour {
             StartCoroutine(Blink(renderer, color, blink));
 
             wallHit++;
-            Debug.Log("Hit a wall!");
+            //Debug.Log("Hit a wall!");
         }
 
         if(col.collider.tag == "StreetObject")
@@ -104,7 +105,7 @@ public class CarCollider : MonoBehaviour {
             StartCoroutine(Blink(renderer, color, blink));
 
             streetObjectHit++;
-            Debug.Log("Hit a street object!");
+            //Debug.Log("Hit a street object!");
         }
     }
 
