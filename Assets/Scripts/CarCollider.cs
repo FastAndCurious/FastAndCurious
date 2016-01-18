@@ -37,8 +37,8 @@ public class CarCollider : MonoBehaviour {
             Color blink = Color.red;
 
             //collision sound
-            AudioSource[] sounds = GetComponents<AudioSource>();
-            crashSound = sounds[1];
+            AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
+            crashSound = sounds[2];
             StartCoroutine(PlaySound(crashSound));
 
             StartCoroutine(Blink(renderer, color, blink));
@@ -59,8 +59,10 @@ public class CarCollider : MonoBehaviour {
             Color blink = Color.black;
 
             //collision sound
-            AudioSource[] sounds = GetComponents<AudioSource>();
-            crashSound = sounds[0];
+            AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
+            
+            crashSound = sounds[1];
+            Debug.Log(crashSound.clip);
             StartCoroutine(PlaySound(crashSound));
 
             //changing color
@@ -78,8 +80,8 @@ public class CarCollider : MonoBehaviour {
             Color blink = Color.yellow;
 
             //collision sound
-            AudioSource[] sounds = GetComponents<AudioSource>();
-            crashSound = sounds[0];
+            AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
+            crashSound = sounds[1];
             StartCoroutine(PlaySound(crashSound));
 
             StartCoroutine(Blink(renderer, color, blink));
@@ -95,8 +97,8 @@ public class CarCollider : MonoBehaviour {
             Color blink = Color.blue;
 
             //collision sound
-            AudioSource[] sounds = GetComponents<AudioSource>();
-            crashSound = sounds[0];
+            AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
+            crashSound = sounds[1];
             StartCoroutine(PlaySound(crashSound));
 
             StartCoroutine(Blink(renderer, color, blink));
@@ -111,7 +113,7 @@ public class CarCollider : MonoBehaviour {
     {
         if (col.collider.tag == "AICar")
         {
-            Wait(1f);
+            Wait(3.0f);
             AICarController aiCar = col.gameObject.GetComponent<AICarController>();
             aiCar.enabled = true;
         }
