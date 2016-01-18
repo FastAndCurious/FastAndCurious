@@ -16,19 +16,30 @@ public class CarCollider : MonoBehaviour {
 
     public Text collisionText;
 
-	void OnCollisionEnter(Collision col)
-    {
+    private AudioSource crashSound;
 
+    void OnCollisionEnter(Collision col)
+    {
         Debug.Log("tag name " + col.collider.tag);
         if (col.collider.tag == "Pedestrian")
         {
+            
             Rigidbody rb = col.gameObject.GetComponent<Rigidbody>();
             rb.isKinematic = false;
+
+            PedestrianController pedestrian = col.gameObject.transform.GetComponentInParent<PedestrianController>();
+            pedestrian.enabled = false;
+
             col.collider.attachedRigidbody.AddForce(1, 1, 500, ForceMode.Acceleration);
-            //Renderer renderer = col.gameObject.transform.Find("Character").GetComponent<Renderer>();
+            
             Renderer renderer = col.gameObject.transform.Find("Cube").GetComponent<Renderer>();
             Color color = renderer.material.color;
             Color blink = Color.red;
+
+            //collision sound
+            AudioSource[] sounds = GetComponents<AudioSource>();
+            crashSound = sounds[1];
+            StartCoroutine(PlaySound(crashSound));
 
             StartCoroutine(Blink(renderer, color, blink));
             
@@ -39,11 +50,20 @@ public class CarCollider : MonoBehaviour {
 
         if(col.collider.tag == "AICar")
         {
-            //Renderer renderer = col.gameObject.transform.Find("model").GetComponent<Renderer>(); da je model kao glavni auto
+            
+            AICarController aiCar = col.gameObject.GetComponent<AICarController>();
+            aiCar.enabled = false;
+            
             Renderer renderer = col.gameObject.GetComponent<Renderer>();
             Color color = renderer.material.color;
             Color blink = Color.black;
 
+            //collision sound
+            AudioSource[] sounds = GetComponents<AudioSource>();
+            crashSound = sounds[0];
+            StartCoroutine(PlaySound(crashSound));
+
+            //changing color
             StartCoroutine(Blink(renderer, color, blink));
            
             carHit++;
@@ -57,6 +77,11 @@ public class CarCollider : MonoBehaviour {
             Color color = renderer.material.color;
             Color blink = Color.yellow;
 
+            //collision sound
+            AudioSource[] sounds = GetComponents<AudioSource>();
+            crashSound = sounds[0];
+            StartCoroutine(PlaySound(crashSound));
+
             StartCoroutine(Blink(renderer, color, blink));
 
             wallHit++;
@@ -69,6 +94,11 @@ public class CarCollider : MonoBehaviour {
             Color color = renderer.material.color;
             Color blink = Color.blue;
 
+            //collision sound
+            AudioSource[] sounds = GetComponents<AudioSource>();
+            crashSound = sounds[0];
+            StartCoroutine(PlaySound(crashSound));
+
             StartCoroutine(Blink(renderer, color, blink));
 
             streetObjectHit++;
@@ -76,7 +106,16 @@ public class CarCollider : MonoBehaviour {
         }
     }
 
-   
+
+    void OnCollisionExit(Collision col)
+    {
+        if (col.collider.tag == "AICar")
+        {
+            Wait(1f);
+            AICarController aiCar = col.gameObject.GetComponent<AICarController>();
+            aiCar.enabled = true;
+        }
+    }
     IEnumerator Blink(Renderer renderer, Color color, Color blinkColor)
     {
        
@@ -95,6 +134,17 @@ public class CarCollider : MonoBehaviour {
 
         renderer.material.SetColor("_Color", color);
 
+    }
+
+    IEnumerator PlaySound(AudioSource audio)
+    {
+        audio.Play();
+        yield return new WaitForSeconds(audio.clip.length);
+    }
+
+    IEnumerator Wait(float time)
+    {
+        yield return new WaitForSeconds(time);
     }
 
 }
