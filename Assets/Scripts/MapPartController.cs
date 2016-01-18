@@ -16,6 +16,12 @@ public class MapPartController :MonoBehaviour {
     private MapPartController southPart = null;//south adjacent map part
     private MapPartController westPart = null;//west adjacent map part
 
+    public float rotation;
+
+    void Awake() {
+        transform.rotation = Quaternion.Euler(0, rotation, 0);
+    }
+
     /// <summary>
     /// Sets the north adjacent map part. When it is determined what map part is to the north 
     /// of this one, link method is invoked, and waypoints that are on the north 
@@ -118,7 +124,7 @@ public class MapPartController :MonoBehaviour {
     /// waypoints on source part of type newLinkType.</param>
     private void link(MapPartController sourcePart, string newLinkType, string thisLinkType) {
         List<Transform> newWaypoints = new List<Transform>();
-        foreach(Transform waypoint in sourcePart.transform.Find("WayPoints")) {
+        foreach(Transform waypoint in sourcePart.transform.Find("Waypoints")) {
             PointDescriptor pointScript = waypoint.GetComponent<PointDescriptor>();
             switch(newLinkType) {
                 case "northLink":
@@ -143,7 +149,7 @@ public class MapPartController :MonoBehaviour {
                     break;
             }
         }
-        Transform waypoints = transform.Find("WayPoints");
+        Transform waypoints = transform.Find("Waypoints");
         foreach(Transform waypoint in waypoints) {
             PointDescriptor pointScript = waypoint.GetComponent<PointDescriptor>();
             switch(thisLinkType) {
@@ -185,55 +191,6 @@ public class MapPartController :MonoBehaviour {
             string point2SecondLabel = newWaypoint.GetComponent<PointDescriptor>().secondLinkLabel;
             if((point1FirstLabel.Equals(point2FirstLabel) && !point1FirstLabel.Equals("") && !point2FirstLabel.Equals("")) || (point1SecondLabel.Equals(point2SecondLabel) && !point1SecondLabel.Equals("") && !point2SecondLabel.Equals(""))) {
                 pointScript.addAdjacentWaypoint(newWaypoint);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Rotates the links by requested amount of degrees clockwise. For example, if 90 is provided as an 
-    /// argument (map block prefab is rotated by 90 degrees clockwise), north links now become east links, 
-    /// east links become south links etc.
-    /// </summary>
-    /// <param name="angle">Map block rotation angle. Can be either 0, 90, 180, 270 or 360.</param>
-    public void rotateLinks(int angle) {
-        Transform waypoints = transform.Find("WayPoints");
-        foreach(Transform waypoint in waypoints) {
-            PointDescriptor pointScript = waypoint.GetComponent<PointDescriptor>();
-            bool wasNorthLink = pointScript.isNorthLink;
-            bool wasEastLink = pointScript.isEastLink;
-            bool wasSouthLink = pointScript.isSouthLink;
-            bool wasWestLink = pointScript.isWestLink;
-
-            pointScript.isNorthLink = false;
-            pointScript.isEastLink = false;
-            pointScript.isSouthLink = false;
-            pointScript.isWestLink = false;
-
-            switch(angle) {
-                case 90:
-                    if(wasNorthLink) pointScript.isEastLink = true;
-                    if(wasEastLink) pointScript.isSouthLink = true;
-                    if(wasSouthLink) pointScript.isWestLink = true;
-                    if(wasWestLink) pointScript.isNorthLink = true;
-                    break;
-                case 180:
-                    if(wasNorthLink) pointScript.isSouthLink = true;
-                    if(wasEastLink) pointScript.isWestLink = true;
-                    if(wasSouthLink) pointScript.isNorthLink = true;
-                    if(wasWestLink) pointScript.isEastLink = true;
-                    break;
-                case 270:
-                    if(wasNorthLink) pointScript.isWestLink = true;
-                    if(wasEastLink) pointScript.isNorthLink = true;
-                    if(wasSouthLink) pointScript.isEastLink = true;
-                    if(wasWestLink) pointScript.isSouthLink = true;
-                    break;
-                case 0:
-                case 360:
-                    break;
-                default:
-                    print("Invalid argument, only rotations by 0, 90, 180, 270 or 360 degrees are allowed.");
-                    break;
             }
         }
     }
