@@ -14,7 +14,7 @@ using System.Collections.Generic;
 public class PointDescriptor : MonoBehaviour {
     private static Dictionary<string, List<string>> dictionary;//dictionary that holds pairs of type (waypoint -> list of waypoints) where key waypoint is waypoint name and value list of waypoints is a list of waypoints that are connected to key waypoint
     private static System.Random indexGenerator;//generates a random index of a list; used to randomly chose one of the waypoints that are connected to this one
-    public int label = 0;//Pedestrians are allowed to move from current waypoint only to waypoints with the same label.    
+    private int label = 0;//Pedestrians are allowed to move from current waypoint only to waypoints with the same label.    
     private List<Transform> adjacentWaypoints;//list of waypoints that are accessible from this waypoint
 
     public Transform[] additionalAdjacentWaypoints;//array of manually inserted additional waypoints that are accessible from this waypoint    
@@ -44,10 +44,12 @@ public class PointDescriptor : MonoBehaviour {
         dictionary.Add("25", new List<string> { "26" });
         dictionary.Add("26", new List<string> { "27" });
         dictionary.Add("28", new List<string> { "15" });
-        dictionary.Add("29", new List<string> { "30", "32" });
+        dictionary.Add("29", new List<string> { "30" });
         dictionary.Add("30", new List<string> { "29", "31" });
         dictionary.Add("31", new List<string> { "30", "32" });
-        dictionary.Add("32", new List<string> { "31", "29" });
+        dictionary.Add("32", new List<string> { "31" });
+        dictionary.Add("34", new List<string> { "35" });
+        dictionary.Add("35", new List<string> { "34" });
     }
 
     /// <summary>
