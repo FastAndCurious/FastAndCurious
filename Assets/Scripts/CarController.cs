@@ -11,19 +11,17 @@ public class CarController : MonoBehaviour {
 	[SerializeField] private float maxReverseTorque = 10f;
 	[SerializeField] private float maxBrakeTorque = 500f;
 	[SerializeField] private float downForce = 100f;
-	[SerializeField] private float topGearSpeed = 30;
-	[SerializeField] private int numberOfGears = 5;
+	[SerializeField] public float topGearSpeed = 30;
+	[SerializeField] public int numberOfGears = 5;
 
 	[SerializeField] private GameObject steeringWheel = null;
 	[SerializeField] private Camera playerCamera = null;
-	[SerializeField] private Text speedAndGearInfo = null;
 
 	private float currentSteeringAngle;
-	private int currentGear = 1;
-	private float gearFactor;
+	public int currentGear = 1;
 	private float currentTorque;
 	private Rigidbody rigidBody;
-	private float topSpeed;
+	public float topSpeed;
 
 	public float CurrentSpeed{ get { return rigidBody.velocity.magnitude * 3.6f; }}
 
@@ -42,7 +40,6 @@ public class CarController : MonoBehaviour {
 		float gears = Input.GetAxis ("Gears");
 
 		controlCar (accelerate, steering, brake, shift, camera, gears);
-		displayInfo ();
 	}
 
 	void controlCar(float accelerate, float steering, float brake, float shift, float camera, float gears) {
@@ -104,8 +101,8 @@ public class CarController : MonoBehaviour {
 			}
 
 			if (currentGear == 0)
-			if (gears > 0f)
-				currentGear++;
+				if (gears > 0f)
+					currentGear++;
 		}
 	}
 
@@ -117,9 +114,5 @@ public class CarController : MonoBehaviour {
 			playerCamera.transform.localRotation = new Quaternion (0, -viewAngle, 0, 1);
 		else
 			playerCamera.transform.localRotation = new Quaternion (0, 0, 0, 1);
-	}
-
-	void displayInfo() {
-		speedAndGearInfo.text = "Speed: " + CurrentSpeed.ToString("0") + "\nGear: " + currentGear;
 	}
 }
