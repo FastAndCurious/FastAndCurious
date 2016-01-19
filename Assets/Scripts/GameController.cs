@@ -23,11 +23,11 @@ public class GameController : MonoBehaviour {
         MapPartController startingPartController = startingPart.GetComponent<MapPartController>();
         MapPartController newPartController = newPart.GetComponent<MapPartController>();
 
-        startingPartController.setNorthPart(newPartController);//ova linija obavještava početni komad (južni) da je sjeverno od njega stvoren novi dio (sjeverni). 
+        startingPartController.setWestPart(newPartController);//ova linija obavještava početni komad (južni) da je sjeverno od njega stvoren novi dio (sjeverni). 
                                                               //Ta metoda je bitna za povezivanje dijelova mape (konkretno - ovom linijom točke na sjevernom rubu 
                                                               //južnog dijela će biti spojene s točkama na južnom rubu sjevernog dijela).
                                                               //Kad ove metode ne bi bile pozvane, pješaci ne bi mogli prelaziti s jednih dijelova mape na druge.
 
-        newPartController.setSouthPart(startingPartController);//analogno prethodnoj liniji
+        newPartController.setEastPart(startingPartController);//analogno prethodnoj liniji
     }
 }
