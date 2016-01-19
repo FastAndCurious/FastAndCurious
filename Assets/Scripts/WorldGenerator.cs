@@ -119,7 +119,7 @@ public class elementZgrade
 
 public class WorldGenerator : MonoBehaviour
 {
-    public GameObject ravniBlok, zavojBlok, tBlok, slijepiBlok, krizanjeBlok;
+    public GameObject[] U, R, D, L, UD, RL, UR, RD, DL, UL, URD, RDL, UDL, URL, URDL;
     public float velicina_blokova;
     public static elementMape[][] mapa;            //opisuje prometnu povezanost grada
     public static List<elementZgrade> zgrade;
@@ -520,23 +520,29 @@ public class WorldGenerator : MonoBehaviour
                 GameObject noviBlok;
                 Vector3 pomak = new Vector3((j ) * velicina_blokova, 0, (i) * velicina_blokova);
                 Quaternion zakret ;
+
+                
                 switch (mapa[i][j].id)
                 {
-                    case 1: noviBlok = slijepiBlok; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 2: noviBlok = slijepiBlok; zakret = Quaternion.Euler(0, 90, 0); break;
-                    case 3: noviBlok = zavojBlok; zakret = Quaternion.Euler(0, 90, 0); break;
-                    case 4: noviBlok = slijepiBlok; zakret = Quaternion.Euler(0, 180, 0); break;
-                    case 5: noviBlok = ravniBlok; zakret = Quaternion.Euler(0, 90, 0); break;
-                    case 6: noviBlok = zavojBlok; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 7: noviBlok = tBlok; zakret = Quaternion.Euler(0, 90, 0); break;
-                    case 8: noviBlok = slijepiBlok; zakret = Quaternion.Euler(0, 270, 0); break;
-                    case 9: noviBlok = zavojBlok; zakret = Quaternion.Euler(0, 180, 0); break;
-                    case 10: noviBlok = ravniBlok; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 11: noviBlok = tBlok; zakret = Quaternion.Euler(0, 180, 0); break;
-                    case 12: noviBlok = zavojBlok; zakret = Quaternion.Euler(0, 270, 0); break;
-                    case 13: noviBlok = tBlok; zakret = Quaternion.Euler(0, 270, 0); break;
-                    case 14: noviBlok = tBlok; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 15: noviBlok = krizanjeBlok; zakret = Quaternion.Euler(0, 0, 0); break;
+                    //  0: " "  1: "╨"  2: "╞"  3: "╚"
+                    //  4: "╥"  5: "║"  6: "╔"  7: "╠"
+                    //  8: "╡"  9: "╝"  10: "═" 11: "╩"
+                    //  12: "╗" 13: "╣" 14: "╦" 15: "╬"
+                    case 1: noviBlok = U[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 2: noviBlok = R[0]; zakret = Quaternion.Euler(0, 90, 0); break;
+                    case 3: noviBlok = UR[0]; zakret = Quaternion.Euler(0, 90, 0); break;
+                    case 4: noviBlok = D[0]; zakret = Quaternion.Euler(0, 180, 0); break;
+                    case 5: noviBlok = UD[0]; zakret = Quaternion.Euler(0, 90, 0); break;
+                    case 6: noviBlok = RD[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 7: noviBlok = URD[0]; zakret = Quaternion.Euler(0, 90, 0); break;
+                    case 8: noviBlok = UDL[0]; zakret = Quaternion.Euler(0, 270, 0); break;
+                    case 9: noviBlok = UL[0]; zakret = Quaternion.Euler(0, 180, 0); break;
+                    case 10: noviBlok = RL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 11: noviBlok = URL[0]; zakret = Quaternion.Euler(0, 180, 0); break;
+                    case 12: noviBlok = DL[0]; zakret = Quaternion.Euler(0, 270, 0); break;
+                    case 13: noviBlok = UDL[0]; zakret = Quaternion.Euler(0, 270, 0); break;
+                    case 14: noviBlok = RDL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 15: noviBlok = URDL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
 
                     default:
                         noviBlok = null;
@@ -620,7 +626,7 @@ public class WorldGenerator : MonoBehaviour
                 mapaBool[i, j] = 1;
 
         zgrade.Add(new elementZgrade(x1, y1, x2, y2, visina));
-        Debug.Log("maxArea:" + maxArea + '\n' + ' ' + x1 + ' ' + y1 + ", " + x2 + ' ' + y2);
+        //Debug.Log("maxArea:" + maxArea + '\n' + ' ' + x1 + ' ' + y1 + ", " + x2 + ' ' + y2);
         /*
         string fileName = "debugIzlaz2.txt";
 
