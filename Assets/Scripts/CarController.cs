@@ -6,11 +6,11 @@ public class CarController : MonoBehaviour {
 	[SerializeField] private WheelCollider[] wheelColliders = new WheelCollider[4] ;
 	[SerializeField] private Vector3 centerOfMass = new Vector3(0, 0, 0);
 	[SerializeField] private float maxSteeringAngle = 30f;
-	[SerializeField] private float currentTorque = 750f;
+	[SerializeField] private float currentTorque = 1000f;
 	[SerializeField] private float maxReverseTorque = 200f;
 	[SerializeField] private float maxBrakeTorque = 1000f;
 	[SerializeField] private float downForce = 100f;
-	[SerializeField] public float topGearSpeed = 30;
+	[SerializeField] public float topGearSpeed = 25;
 	[SerializeField] public int numberOfGears = 5;
 
 	[SerializeField] private GameObject steeringWheel = null;
