@@ -15,9 +15,9 @@ public class CarSound : MonoBehaviour {
     }
 	
 	void Update () {
-        
-        //popraviti da bude po brzini
-        carEngine.pitch = GetComponent<CarController>().CurrentSpeed / 30; 
+
+        CarController car = GetComponent<CarController>();
+        carEngine.pitch = car.CurrentSpeed / car.topSpeed; 
         Debug.Log(carEngine.clip.name + " " + carEngine.pitch);
     }
 }
