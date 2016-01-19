@@ -27,6 +27,5 @@ public class GUIController : MonoBehaviour {
     {
         score += scoreToAdd;
         gText.text = score.ToString();
-        Debug.Log("Score:" + score);
     }
 }
