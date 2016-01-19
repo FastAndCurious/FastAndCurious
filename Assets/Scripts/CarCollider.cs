@@ -17,95 +17,96 @@ public class CarCollider : MonoBehaviour {
     public Text collisionText;
 
     private AudioSource crashSound;
-
+    private float lastCollisionTime;
     void OnCollisionEnter(Collision col)
     {
-        //Debug.Log("tag name " + col.collider.tag);
-        if (col.collider.tag == "Pedestrian")
+        if (Time.time - lastCollisionTime > 2)
         {
-            
-            Rigidbody rb = col.gameObject.GetComponent<Rigidbody>();
-            rb.isKinematic = false;
+            lastCollisionTime = Time.time;
+            if (col.collider.tag == "Pedestrian")
+            {
 
-            PedestrianController pedestrian = col.gameObject.transform.GetComponentInParent<PedestrianController>();
-            pedestrian.enabled = false;
+                Rigidbody rb = col.gameObject.GetComponent<Rigidbody>();
+                rb.isKinematic = false;
 
-            col.collider.attachedRigidbody.AddForce(1, 1, 500, ForceMode.Acceleration);
-            
-            Renderer renderer = col.gameObject.transform.Find("Cube").GetComponent<Renderer>();
-            Color color = renderer.material.color;
-            Color blink = Color.red;
+                PedestrianController pedestrian = col.gameObject.transform.GetComponentInParent<PedestrianController>();
+                pedestrian.enabled = false;
 
-            //collision sound
-            AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
-            crashSound = sounds[2];
-            StartCoroutine(PlaySound(crashSound));
-            crashSound = sounds[4];
-            StartCoroutine(PlaySound(crashSound));
-            StartCoroutine(Blink(renderer, color, blink));
-            
-            pedestrianHit++;
+                col.collider.attachedRigidbody.AddForce(1, 1, 500, ForceMode.Acceleration);
 
-            //Debug.Log("Hit a pedestrian!");
-        }
+                Renderer renderer = col.gameObject.transform.Find("Cube").GetComponent<Renderer>();
+                Color color = renderer.material.color;
+                Color blink = Color.red;
 
-        if(col.collider.tag == "AICar")
-        {
-            
-            AICarController aiCar = col.gameObject.GetComponent<AICarController>();
-            aiCar.enabled = false;
-            
-            Renderer renderer = col.gameObject.GetComponent<Renderer>();
-            Color color = renderer.material.color;
-            Color blink = Color.black;
+                //collision sound
+                AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
+                crashSound = sounds[2];
+                StartCoroutine(PlaySound(crashSound));
+                crashSound = sounds[4];
+                StartCoroutine(PlaySound(crashSound));
+                StartCoroutine(Blink(renderer, color, blink));
 
-            //collision sound
-            AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
-            
-            crashSound = sounds[1];
-            Debug.Log(crashSound.clip);
-            StartCoroutine(PlaySound(crashSound));
+                pedestrianHit++;
 
-            //changing color
-            StartCoroutine(Blink(renderer, color, blink));
-           
-            carHit++;
-            
-            //Debug.Log("Hit a car!");
-        }
+            }
 
-        if(col.collider.tag == "Wall")
-        {
-            Renderer renderer = col.gameObject.GetComponent<Renderer>();
-            Color color = renderer.material.color;
-            Color blink = Color.yellow;
+            if (col.collider.tag == "AICar")
+            {
 
-            //collision sound
-            AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
-            crashSound = sounds[1];
-            StartCoroutine(PlaySound(crashSound));
+                AICarController aiCar = col.gameObject.GetComponent<AICarController>();
+                aiCar.enabled = false;
 
-            StartCoroutine(Blink(renderer, color, blink));
+                Renderer renderer = col.gameObject.GetComponent<Renderer>();
+                Color color = renderer.material.color;
+                Color blink = Color.black;
 
-            wallHit++;
-            //Debug.Log("Hit a wall!");
-        }
+                //collision sound
+                AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
 
-        if(col.collider.tag == "StreetObject")
-        {
-            Renderer renderer = col.gameObject.GetComponent<Renderer>();
-            Color color = renderer.material.color;
-            Color blink = Color.blue;
+                crashSound = sounds[1];
+                Debug.Log(crashSound.clip);
+                StartCoroutine(PlaySound(crashSound));
 
-            //collision sound
-            AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
-            crashSound = sounds[1];
-            StartCoroutine(PlaySound(crashSound));
+                //changing color
+                StartCoroutine(Blink(renderer, color, blink));
 
-            StartCoroutine(Blink(renderer, color, blink));
+                carHit++;
 
-            streetObjectHit++;
-            //Debug.Log("Hit a street object!");
+            }
+
+            if (col.collider.tag == "Wall")
+            {
+                Renderer renderer = col.gameObject.GetComponent<Renderer>();
+                Color color = renderer.material.color;
+                Color blink = Color.yellow;
+
+                //collision sound
+                AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
+                crashSound = sounds[1];
+                StartCoroutine(PlaySound(crashSound));
+
+                StartCoroutine(Blink(renderer, color, blink));
+
+                wallHit++;
+
+            }
+
+            if (col.collider.tag == "StreetObject")
+            {
+                Renderer renderer = col.gameObject.GetComponent<Renderer>();
+                Color color = renderer.material.color;
+                Color blink = Color.blue;
+
+                //collision sound
+                AudioSource[] sounds = transform.Find("Sound").GetComponents<AudioSource>();
+                crashSound = sounds[1];
+                StartCoroutine(PlaySound(crashSound));
+
+                StartCoroutine(Blink(renderer, color, blink));
+
+                streetObjectHit++;
+
+            }
         }
     }
 
