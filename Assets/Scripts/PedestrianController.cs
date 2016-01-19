@@ -17,10 +17,10 @@ public class PedestrianController :MonoBehaviour {
     private Animator animator;//character animator used to set appropriate animations
     private int idleHash = Animator.StringToHash("Idle");//hash value of idle animation state; more efficient than string parsing every frame
     private int walkHash = Animator.StringToHash("Walk");//hash value of walking animation state   
-    
+
     public float rotationSpeed;//rotation speed
     public float walkSpeed;//movement speed
-    
+
     /// <summary>
     /// Sets the starting waypoint to be the nearest one.
     /// </summary>
@@ -54,7 +54,7 @@ public class PedestrianController :MonoBehaviour {
             } else {
                 rotate();
             }
-        }                
+        }
         if(!shouldStop) walk();
     }
 
@@ -132,7 +132,7 @@ public class PedestrianController :MonoBehaviour {
     /// the road - he will not stop in the middle of the road).
     /// </summary>
     private void walk() {
-        float distanceToPoint = (currentWaypoint.position - transform.position).sqrMagnitude;//it is not necessary for character to reach the exact waypoint location
+        float distanceToPoint = (new Vector3(currentWaypoint.position.x, 0, currentWaypoint.position.z) - new Vector3(transform.position.x, 0, transform.position.z)).sqrMagnitude;//it is not necessary for character to reach the exact waypoint location
         if(distanceToPoint <= MINIMAL_DISTANCE_TO_POINT) {
             setNextWayPoint();
             alreadyWalking = allowedToWalk();

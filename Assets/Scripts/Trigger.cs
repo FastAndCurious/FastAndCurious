@@ -8,16 +8,16 @@ using System.Collections;
 /// script detects a Rigidbody near the collider, it notifies its parent GameObject,
 /// which will be the character.
 /// </summary>
-public class Trigger : MonoBehaviour {
+public class Trigger :MonoBehaviour {
     private PedestrianController pedestrianScript;//character which will be notified about presence of another Rigidbody
 
     /// <summary>
     /// Assigns a character which this script will keep informed about presence of 
     /// other Rigidbodies.
     /// </summary>
-	void Start () {
+	void Start() {
         pedestrianScript = transform.parent.GetComponent<PedestrianController>();
-	}
+    }
 
     /// <summary>
     /// This method is called automatically once a Rigidbody enters the trigger collider 

@@ -8,7 +8,7 @@ using System.Collections;
 /// script detects a Rigidbody near the collider, it notifies its parent GameObject,
 /// which will be the car.
 /// </summary>
-public class CarTrigger : MonoBehaviour {
+public class CarTrigger :MonoBehaviour {
     private AICarController carScript;//car which will be notified about presence of another Rigidbody
 
     /// <summary>
