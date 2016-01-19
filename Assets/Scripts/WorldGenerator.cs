@@ -103,6 +103,18 @@ public class Cravler
 /// 
 /// </summary>
 
+public class elementZgrade
+{
+    public float x1, x2, y1, y2, visina;
+    public elementZgrade (float X1, float Y1, float X2, float Y2, float Visina)
+    {
+        x1 = X1;
+        y1 = Y1;
+        x2 = X2;
+        y2 = Y2;
+        visina = Visina;
+    }
+}
 
 
 public class WorldGenerator : MonoBehaviour
@@ -110,7 +122,9 @@ public class WorldGenerator : MonoBehaviour
     public GameObject ravniBlok, zavojBlok, tBlok, slijepiBlok, krizanjeBlok;
     public float velicina_blokova;
     public static elementMape[][] mapa;            //opisuje prometnu povezanost grada
+    public static List<elementZgrade> zgrade;
 
+    
     private static GameObject[,] mapaBlokova;
     private static float[] vanjske_tocke;                   //vanjski obrub grada: -polarni zapis
     private static int[,] kartezijeve_tocke;                //                     -kartezijev zapis
@@ -122,6 +136,7 @@ public class WorldGenerator : MonoBehaviour
     private static int[] pomakY = new int[4] { 1, 0, -1, 0 };
     private static int[] pomakX = new int[4] { 0, 1, 0, -1 };
 
+    private static int[,] mapaBool;
 
     //oznacava sve blokove ispod proslijedene linije
     private static void oznaciNaMapi(int x1, int y1, int x2, int y2)
@@ -202,7 +217,9 @@ public class WorldGenerator : MonoBehaviour
     void Start()
     {
         // buduci argumenti poziva funkcije, a ne konstruktora
+
         
+
         int pojavljivanje_avenije = velicina_mape / 10;
         if (pojavljivanje_avenije < 10)
             pojavljivanje_avenije = 10;
@@ -428,6 +445,17 @@ public class WorldGenerator : MonoBehaviour
 
         }
 
+        mapaBool = new int[velicina_mape, velicina_mape];
+        for (int i = 0; i < velicina_mape; i++)
+            for (int j = 0; j < velicina_mape; j++)
+                if (mapa[i][j].id == 0)
+                    mapaBool[i, j] = 0;
+                else
+                    mapaBool[i, j] = 1;
+
+        zgrade = new List<elementZgrade>();
+        while (najveciPravokutnik() == 0) ;
+
         iscrtajMapu();
 
         // debug print
@@ -484,12 +512,13 @@ public class WorldGenerator : MonoBehaviour
 
     private void iscrtajMapu()
     {
+        GameObject ovaj = GameObject.Find("WG_SpawnPoint");
         mapaBlokova = new GameObject[velicina_mape, velicina_mape];
         for (int i = 0; i < velicina_mape; i++)
             for (int j = 0; j< velicina_mape; j++)
             {
                 GameObject noviBlok;
-                Vector3 pomak = new Vector3((i - velicina_mape / 2) * velicina_blokova, 0, (j - velicina_mape / 2) * velicina_blokova);
+                Vector3 pomak = new Vector3((j ) * velicina_blokova, 0, (i) * velicina_blokova);
                 Quaternion zakret ;
                 switch (mapa[i][j].id)
                 {
@@ -516,10 +545,140 @@ public class WorldGenerator : MonoBehaviour
                 }
                 if (noviBlok != null)
                 {
-                    GameObject ovaj = GameObject.Find("WG_SpawnPoint");
                     mapaBlokova[i, j] = ((GameObject)GameObject.Instantiate(noviBlok, pomak, zakret));
                     mapaBlokova[i, j].transform.parent = ovaj.transform;
                 }
             }
+        foreach (elementZgrade zgrada in zgrade)
+        {
+            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.transform.position = new Vector3(((zgrada.x2 + zgrada.x1) / 2) * velicina_blokova, zgrada.visina / 2, ((zgrada.y2 + zgrada.y1) / 2 * velicina_blokova));
+            cube.transform.localScale = new Vector3((zgrada.x2 - zgrada.x1) * velicina_blokova, zgrada.visina, ((zgrada.y2 - zgrada.y1) * velicina_blokova));
+            cube.transform.parent = ovaj.transform;
+        }
+    }
+
+    private int najveciPravokutnik() {
+        int x1 = -1, x2 = -1 , y1 = -1, y2 = -1, z = -1;
+
+        int[,] lijevo = new int[velicina_mape, velicina_mape];
+        int[,] desno = new int[velicina_mape, velicina_mape];
+        for (int i = 0; i < velicina_mape; i++)
+        {
+            int brojac = 0;
+            for (int j = 0; j < velicina_mape; j++)
+            {
+                brojac++;
+                if (mapaBool[i , j] != 0) brojac = 0;
+                lijevo[i, j] = brojac;
+            }
+            brojac = 0;
+            for (int j = velicina_mape-1; j >= 0; j--)
+            {
+                brojac++;
+                if (mapaBool[i, j] != 0) brojac = 0;
+                desno[i, j] = brojac;
+            }
+        }
+
+        int maxArea = 0;
+        for (int j = 0; j < velicina_mape; j++)
+        {
+
+            int zadnji = 0, moguLijevo = 10000, moguDesno = 10000;
+            for (int i = 0; i < velicina_mape; i++)
+            {
+                zadnji++;
+                moguLijevo = Mathf.Min(moguLijevo, lijevo[i, j]);
+                moguDesno = Mathf.Min(moguDesno, desno[i, j]);
+                if (mapaBool[i, j] != 0)
+                { 
+                    zadnji = 0;
+                    moguLijevo = moguDesno = 10000;
+                }
+
+                int newArea = zadnji * (moguLijevo + moguDesno - 1);
+                if (maxArea < newArea)
+                {
+                    maxArea = newArea;
+                    z = i;
+                    x1 = j - moguLijevo + 1;
+                    x2 = j + moguDesno - 1;
+                    y1 = i - zadnji +1;
+                    y2 = i;
+
+                } 
+            }
+        }
+        float visina = 1;
+
+        if (x1 == -1)
+            return -1;
+
+        for (int j = x1; j <= x2; j++)
+            for (int i = y1; i <= y2; i++)
+                mapaBool[i, j] = 1;
+
+        zgrade.Add(new elementZgrade(x1, y1, x2, y2, visina));
+        Debug.Log("maxArea:" + maxArea + '\n' + ' ' + x1 + ' ' + y1 + ", " + x2 + ' ' + y2);
+        /*
+        string fileName = "debugIzlaz2.txt";
+
+        if (File.Exists(fileName))
+        {
+            Debug.Log(fileName + " already exists.");
+            //return 0;
+        }
+        var sr = File.CreateText(fileName);
+
+
+        for (int i = velicina_mape - 1; i >= 0; i--)
+        {
+            string buffer = "";
+            for (int j = 0; j < velicina_mape; j++)
+            {
+                
+                buffer += lijevo[i, j].ToString("  00");
+
+            }
+            sr.WriteLine(buffer);
+
+        }
+        sr.Close();
+
+
+        fileName = "debugIzlaz1.txt";
+
+        if (File.Exists(fileName))
+        {
+            Debug.Log(fileName + " already exists.");
+            //return;
+        }
+        sr = File.CreateText(fileName);
+
+
+        for (int i = velicina_mape - 1; i >= 0; i--)
+        {
+            string buffer = "";
+            for (int j = 0; j < velicina_mape; j++)
+            {
+
+                buffer += desno[i, j].ToString("  00");
+
+            }
+            sr.WriteLine(buffer);
+
+        }
+        sr.Close();
+        */
+        return 0;
+    }
+
+    private void izracunajKutoveZgrada()
+    {
+        for (int i = 0; i < zgrade.Count; i++)
+        {
+            zgrade[i].x1 = (zgrade[i].x1 - velicina_mape / 2) * velicina_blokova / 2;
+        }
     }
 }
