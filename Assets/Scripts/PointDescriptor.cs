@@ -15,7 +15,7 @@ public class PointDescriptor : MonoBehaviour {
     private static Dictionary<string, List<string>> dictionary;//dictionary that holds pairs of type (waypoint -> list of waypoints) where key waypoint is waypoint name and value list of waypoints is a list of waypoints that are connected to key waypoint
     private static System.Random indexGenerator;//generates a random index of a list; used to randomly chose one of the waypoints that are connected to this one
     private int label = 0;//Pedestrians are allowed to move from current waypoint only to waypoints with the same label.    
-    private List<Transform> adjacentWaypoints;//list of waypoints that are accessible from this waypoint
+    public List<Transform> adjacentWaypoints;//list of waypoints that are accessible from this waypoint
 
     public Transform[] additionalAdjacentWaypoints;//array of manually inserted additional waypoints that are accessible from this waypoint    
     public bool isNorthLink;//if this waypoint is on the north side of the map part, this variable will be set to true; waypoints that are a north link have references to all the waypoints on the south side of the north adjacent map part
@@ -25,29 +25,31 @@ public class PointDescriptor : MonoBehaviour {
     public string firstLinkLabel;//two waypoints can't be connected if at least one of their link labels doesn't match
     public string secondLinkLabel;
 
+    //Connects the waypoints.
     static PointDescriptor() {
         indexGenerator = new System.Random();
         dictionary = new Dictionary<string, List<string>>();
-        dictionary.Add("1", new List<string> { "2" });
-        dictionary.Add("2", new List<string> { "1", "3" });
-        dictionary.Add("3", new List<string> { "2" });
-        dictionary.Add("4", new List<string> { "5" });
-        dictionary.Add("5", new List<string> { "6", "4" });
-        dictionary.Add("6", new List<string> { "5" });
+        dictionary.Add("5", new List<string> { "6" });
+        dictionary.Add("6", new List<string> { "7" });
         dictionary.Add("7", new List<string> { "8" });
-        dictionary.Add("8", new List<string> { "7", "9" , "13"});
-        dictionary.Add("9", new List<string> { "8" });
-        dictionary.Add("10", new List<string> { "11" });
-        dictionary.Add("11", new List<string> { "10", "12", "20"});
-        dictionary.Add("12", new List<string> { "11" });
-        dictionary.Add("13", new List<string> { "8" });
-        dictionary.Add("14", new List<string> { "15" });
-        dictionary.Add("15", new List<string> { "14", "16" });
-        dictionary.Add("16", new List<string> { "15" });
-        dictionary.Add("17", new List<string> { "18" });
-        dictionary.Add("18", new List<string> { "17", "19" });
-        dictionary.Add("19", new List<string> { "18" });
-        dictionary.Add("20", new List<string> { "11" });
+        dictionary.Add("12", new List<string> { "13" });
+        dictionary.Add("13", new List<string> { "14" });
+        dictionary.Add("14", new List<string> { "28" });
+        dictionary.Add("17", new List<string> { "1" });
+        dictionary.Add("18", new List<string> { "19" });
+        dictionary.Add("20", new List<string> { "21" });
+        dictionary.Add("21", new List<string> { "22" });
+        dictionary.Add("22", new List<string> { "23" });
+        dictionary.Add("24", new List<string> { "25" });
+        dictionary.Add("25", new List<string> { "26" });
+        dictionary.Add("26", new List<string> { "27" });
+        dictionary.Add("28", new List<string> { "15" });
+        dictionary.Add("29", new List<string> { "30" });
+        dictionary.Add("30", new List<string> { "29", "31" });
+        dictionary.Add("31", new List<string> { "30", "32" });
+        dictionary.Add("32", new List<string> { "31" });
+        dictionary.Add("34", new List<string> { "35" });
+        dictionary.Add("35", new List<string> { "34" });
     }
 
     /// <summary>
@@ -100,6 +102,8 @@ public class PointDescriptor : MonoBehaviour {
     /// <returns>Returns a randomly chosen waypoint adjacent to this one that has not 
     /// already been visited.</returns>
     public Transform getAdjacentWaypoint(string alreadyVisitedWaypoint) {
+        if(adjacentWaypoints.Count == 1) return adjacentWaypoints[0];
+
         int randomIndex = indexGenerator.Next(0, adjacentWaypoints.Count);
         return adjacentWaypoints[randomIndex].name != alreadyVisitedWaypoint ? 
             adjacentWaypoints[randomIndex] : adjacentWaypoints[(randomIndex+1)%adjacentWaypoints.Count];

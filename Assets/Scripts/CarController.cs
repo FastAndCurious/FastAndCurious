@@ -10,18 +10,17 @@ public class CarController : MonoBehaviour {
 	[SerializeField] private float maxReverseTorque = 10f;
 	[SerializeField] private float maxBrakeTorque = 500f;
 	[SerializeField] private float downForce = 100f;
-	[SerializeField] private float topGearSpeed = 30;
-	[SerializeField] private int numberOfGears = 5;
+	[SerializeField] public float topGearSpeed = 30;
+	[SerializeField] public int numberOfGears = 5;
 
 	[SerializeField] private GameObject steeringWheel = null;
 	[SerializeField] private Camera playerCamera = null;
 
 	private float currentSteeringAngle;
-	private int currentGear = 1;
-	private float gearFactor;
+	public int currentGear = 1;
 	private float currentTorque;
 	private Rigidbody rigidBody;
-	private float topSpeed;
+	public float topSpeed;
 
 	public float CurrentSpeed{ get { return rigidBody.velocity.magnitude * 3.6f; }}
 
@@ -40,7 +39,6 @@ public class CarController : MonoBehaviour {
 		float gears = Input.GetAxis ("Gears");
 
 		controlCar (accelerate, steering, brake, shift, camera, gears);
-		displayInfo ();
 	}
 
 	void controlCar(float accelerate, float steering, float brake, float shift, float camera, float gears) {
@@ -105,14 +103,6 @@ public class CarController : MonoBehaviour {
 				if (gears > 0f)
 					currentGear++;
 		}
-		calculateGearFactor ();
-	}
-
-	void calculateGearFactor()
-	{
-		float f = (1/(float) numberOfGears);
-		var targetGearFactor = Mathf.InverseLerp(f * currentGear, f * (currentGear + 1), Mathf.Abs(CurrentSpeed/topSpeed));
-		gearFactor = Mathf.Lerp(gearFactor, targetGearFactor, Time.deltaTime * 5f);
 	}
 
 	void lookAround(float camera) {
@@ -123,9 +113,5 @@ public class CarController : MonoBehaviour {
 			playerCamera.transform.localRotation = new Quaternion (0, -viewAngle, 0, 1);
 		else
 			playerCamera.transform.localRotation = new Quaternion (0, 0, 0, 1);
-	}
-
-	void displayInfo() {
-		Debug.Log ("Gear: " + currentGear + "; Current speed = " + CurrentSpeed + "; Motor = " + gearFactor * 3000);
 	}
 }
