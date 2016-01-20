@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class GUIController : MonoBehaviour {
     [SerializeField] private Text speedAndGearInfo = null;
     [SerializeField] private GameObject car = null;
+    public int faultsToLose;
     private int score;
     private int faults;
     private int lvl;
@@ -14,15 +15,19 @@ public class GUIController : MonoBehaviour {
     private bool paused = false;
 
     public GameObject pauseHolder;
+    public GameObject nickHolder;
 
     public GameObject text;
+    public InputField nickName;
 
     private Text gText;
+    private Text gNick;
 
-    void Start ()
+    void Start()
     {
         score = 0;
         gText = text.GetComponent<Text>();
+        car = GameObject.FindGameObjectWithTag("PlayerCar");
     }
 
     void Update()
@@ -45,22 +50,25 @@ public class GUIController : MonoBehaviour {
                 Time.timeScale = 0;
             }
         }
-        
+
     }
 
-    void End ()
+    void End(string nick)
     {
-        SendFinalScore();
+        SendFinalScore(nick);
     }
 
-    void SendFinalScore()
+    void SendFinalScore(string nick)
     {
         var form = new WWWForm();
-        form.AddField("finalScore", score);
+        form.AddField("score", score);
+        form.AddField("player", nick);
 
-        WWW www = new WWW("http://localhost:3333/postscore", form);
+        Debug.Log("pravim request");
+        WWW www = new WWW("http://dito.ninja:3000/postscore", form);
 
         StartCoroutine(SendScoreToWebsite(www));
+        Debug.Log("poslo request");
     }
 
     IEnumerator SendScoreToWebsite(WWW www)
@@ -68,13 +76,13 @@ public class GUIController : MonoBehaviour {
         yield return www;
     }
 
-	// Update is called once per frame
-	void FixedUpdate () {
-		speedAndGearInfo.text = "Speed: " + car.gameObject.GetComponent<CarController>().CurrentSpeed.ToString("0")
-			+ "\nGear: " + car.gameObject.GetComponent<CarController>().currentGear;
+    // Update is called once per frame
+    void FixedUpdate() {
+        speedAndGearInfo.text = "Speed: " + car.gameObject.GetComponent<CarController>().CurrentSpeed.ToString("0")
+            + "\nGear: " + car.gameObject.GetComponent<CarController>().currentGear;
 
-        if (score >= 100) End();
-	}
+        //if (score >= 100) End();
+    }
 
     public void PederstrianHit()
     {
@@ -113,7 +121,16 @@ public class GUIController : MonoBehaviour {
 
     public void ReturnToMainMenu()
     {
-        End();
+        nickHolder.SetActive(true);
+    }
+
+    public void SendHighscore()
+    {
+        string nick = nickName.text;
+        End(nick);
+        Debug.Log("valjd sam poslo");
         SceneManager.LoadScene("MainMenu");
     }
+
 }
+

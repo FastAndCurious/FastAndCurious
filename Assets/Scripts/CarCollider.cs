@@ -9,7 +9,7 @@ public class CarCollider : MonoBehaviour {
     private int wallHit = 0;
     private int streetObjectHit = 0;
 
-    private GUIController guiController = GameObject.Find("GUICanvas").GetComponent<GUIController>();
+    private GUIController guiController;
 
     int _carHit { get; set; }
     int _pedestrainHit { get; set; }
@@ -20,6 +20,12 @@ public class CarCollider : MonoBehaviour {
 
     private AudioSource crashSound;
     private float lastCollisionTime;
+
+    void Start()
+    {
+        guiController = GameObject.Find("GUICanvas").GetComponent<GUIController>();
+    }
+
     void OnCollisionEnter(Collision col)
     {
         if (Time.time - lastCollisionTime > 2)
