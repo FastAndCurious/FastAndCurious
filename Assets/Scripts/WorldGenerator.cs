@@ -607,22 +607,20 @@ public class WorldGenerator : MonoBehaviour
                     if (i > 0 && mapa[i - 1][j].id > 0)
                     {
                         matricaSkripti[i, j].setSouthPart(matricaSkripti[i - 1, j]);
-                        matricaSkripti[i - 1, j].setNorthPart(matricaSkripti[i, j]);
+                       
                     }
                     if (i < velicina_mape - 1 && mapa[i + 1][j].id > 0)
                     {
                         matricaSkripti[i, j].setNorthPart(matricaSkripti[i + 1, j]);
-                        matricaSkripti[i + 1, j].setSouthPart(matricaSkripti[i, j]);
+                        
                     }
                     if (j > 0 && mapa[i][j - 1].id > 0)
                     {
                         matricaSkripti[i, j - 1].setEastPart(matricaSkripti[i, j]);
-                        matricaSkripti[i, j].setWestPart(matricaSkripti[i, j - 1]);
                     }
                     if (j < velicina_mape - 1 && mapa[i][j + 1].id > 0)
                     {
                         matricaSkripti[i, j + 1].setWestPart(matricaSkripti[i, j]);
-                        matricaSkripti[i, j].setEastPart(matricaSkripti[i, j + 1]);
                     }
 
                 }
