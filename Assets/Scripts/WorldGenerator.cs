@@ -119,17 +119,18 @@ public class elementZgrade
 
 public class WorldGenerator : MonoBehaviour
 {
-    public GameObject[] U, R, D, L, UD, RL, UR, RD, DL, UL, URD, RDL, UDL, URL, URDL;
+    
+    public GameObject prefabZgrada;
     public float velicina_blokova;
     public static elementMape[][] mapa;            //opisuje prometnu povezanost grada
     public static List<elementZgrade> zgrade;
+    public GameObject[] U, R, D, L, UD, RL, UR, RD, DL, UL, URD, RDL, UDL, URL, URDL;
 
-    
     private static GameObject[,] mapaBlokova;
     private static float[] vanjske_tocke;                   //vanjski obrub grada: -polarni zapis
     private static int[,] kartezijeve_tocke;                //                     -kartezijev zapis
     private static Queue<Cravler> cravler;                  //spremnik za cravlera
-    private static int velicina_mape = 32;
+    private static int velicina_mape = 48;
 
     private static elementMape[][] pomMapa;
     private static int max_x, max_y, min_x, min_y;
@@ -456,6 +457,11 @@ public class WorldGenerator : MonoBehaviour
         zgrade = new List<elementZgrade>();
         while (najveciPravokutnik() == 0) ;
 
+        foreach (elementZgrade zgrada in zgrade)
+        {
+            zgrada.visina = 5*Mathf.PerlinNoise((zgrada.x1 + zgrada.x2) / (2*velicina_mape), (zgrada.y1 + zgrada.y2) / (2 * velicina_mape));
+        }
+
         iscrtajMapu();
 
         // debug print
@@ -529,18 +535,18 @@ public class WorldGenerator : MonoBehaviour
                     //  8: "╡"  9: "╝"  10: "═" 11: "╩"
                     //  12: "╗" 13: "╣" 14: "╦" 15: "╬"
                     case 1: noviBlok = U[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 2: noviBlok = R[0]; zakret = Quaternion.Euler(0, 90, 0); break;
-                    case 3: noviBlok = UR[0]; zakret = Quaternion.Euler(0, 90, 0); break;
-                    case 4: noviBlok = D[0]; zakret = Quaternion.Euler(0, 180, 0); break;
-                    case 5: noviBlok = UD[0]; zakret = Quaternion.Euler(0, 90, 0); break;
+                    case 2: noviBlok = R[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 3: noviBlok = UR[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 4: noviBlok = D[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 5: noviBlok = UD[0]; zakret = Quaternion.Euler(0, 0, 0); break;
                     case 6: noviBlok = RD[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 7: noviBlok = URD[0]; zakret = Quaternion.Euler(0, 90, 0); break;
-                    case 8: noviBlok = UDL[0]; zakret = Quaternion.Euler(0, 270, 0); break;
-                    case 9: noviBlok = UL[0]; zakret = Quaternion.Euler(0, 180, 0); break;
+                    case 7: noviBlok = URD[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 8: noviBlok = L[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 9: noviBlok = UL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
                     case 10: noviBlok = RL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 11: noviBlok = URL[0]; zakret = Quaternion.Euler(0, 180, 0); break;
-                    case 12: noviBlok = DL[0]; zakret = Quaternion.Euler(0, 270, 0); break;
-                    case 13: noviBlok = UDL[0]; zakret = Quaternion.Euler(0, 270, 0); break;
+                    case 11: noviBlok = URL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 12: noviBlok = DL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 13: noviBlok = UDL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
                     case 14: noviBlok = RDL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
                     case 15: noviBlok = URDL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
 
@@ -557,9 +563,9 @@ public class WorldGenerator : MonoBehaviour
             }
         foreach (elementZgrade zgrada in zgrade)
         {
-            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.transform.position = new Vector3(((zgrada.x2 + zgrada.x1) / 2) * velicina_blokova, zgrada.visina / 2, ((zgrada.y2 + zgrada.y1) / 2 * velicina_blokova));
-            cube.transform.localScale = new Vector3((zgrada.x2 - zgrada.x1) * velicina_blokova, zgrada.visina, ((zgrada.y2 - zgrada.y1) * velicina_blokova));
+            Vector3 position = new Vector3(((zgrada.x2 + zgrada.x1) / 2) * velicina_blokova, zgrada.visina*50 / 2, ((zgrada.y2 + zgrada.y1) / 2 * velicina_blokova));
+            GameObject cube = ((GameObject)GameObject.Instantiate(prefabZgrada, position, Quaternion.Euler(0,0,0)));
+            cube.transform.localScale = new Vector3((zgrada.x2 - zgrada.x1 + 1) * velicina_blokova, zgrada.visina*50, ((zgrada.y2 - zgrada.y1 + 1) * velicina_blokova));
             cube.transform.parent = ovaj.transform;
         }
     }
