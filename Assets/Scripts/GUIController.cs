@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GUIController : MonoBehaviour {
     [SerializeField] private Text speedAndGearInfo = null;
@@ -9,6 +10,10 @@ public class GUIController : MonoBehaviour {
     private int faults;
     private int lvl;
     private bool ended = false;
+
+    private bool paused = false;
+
+    public GameObject pauseHolder;
 
     public GameObject text;
 
@@ -23,6 +28,24 @@ public class GUIController : MonoBehaviour {
     void Update()
     {
         //if (!ended) AddScore(1);
+        if (paused)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                paused = false;
+                pauseHolder.SetActive(false);
+                Time.timeScale = 1;
+            }
+        } else
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                paused = true;
+                pauseHolder.SetActive(true);
+                Time.timeScale = 0;
+            }
+        }
+        
     }
 
     void End ()
@@ -72,5 +95,11 @@ public class GUIController : MonoBehaviour {
         {
             /// FINISH GAME
         }
+    }
+
+    public void ReturnToMainMenu()
+    {
+        End();
+        SceneManager.LoadScene("MainMenu");
     }
 }
