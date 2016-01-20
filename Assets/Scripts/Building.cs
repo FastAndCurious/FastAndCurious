@@ -12,10 +12,4 @@ public class Building : MonoBehaviour {
             new Vector2(this.gameObject.transform.localScale.x  * scaleFactor, this.gameObject.transform.localScale.y * scaleFactor)
         );
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }
