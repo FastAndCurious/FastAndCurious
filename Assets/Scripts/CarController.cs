@@ -22,24 +22,33 @@ public class CarController : MonoBehaviour {
 	public float topSpeed;
 
 	public float CurrentSpeed{ get { return rigidBody.velocity.magnitude * 3.6f; }}
+    public float TopSpeed { get { return currentGear*topGearSpeed; } }
 
-	void Start () {
+
+    void Start () {
 		wheelColliders [0].attachedRigidbody.centerOfMass = centerOfMass;
 		rigidBody = GetComponent<Rigidbody> ();
 	}
 
 	void FixedUpdate () {
 		float accelerate = Input.GetAxis ("Accelerate");
-		float steering = Input.GetAxis ("Steering");
+        Debug.Log("ubrzanje: " + accelerate);
+        float steering = Input.GetAxis ("Steering");
 		float brake = Input.GetAxis ("Brake");
+        Debug.Log("kocnica: " + brake);
 		float shift = Input.GetAxis ("Shift");
 		float camera = Input.GetAxis ("Camera");
-		float gears = Input.GetAxis ("Gears");
-		float reverse = Input.GetAxis ("Reverse");
-
-		applySteering (steering);
+        bool[] gears = { false, false, false, false, false, false, false };
+        gears[0] = Input.GetButton("Gear1");
+        gears[1] = Input.GetButton("Gear2");
+        gears[2] = Input.GetButton("Gear3");
+        gears[3] = Input.GetButton("Gear4");
+        gears[4] = Input.GetButton("Gear5");
+        gears[5] = Input.GetButton("Gear6");
+        gears[6] = Input.GetButton("Gear7");
+        applySteering (steering);
 		applyDrive (accelerate, brake);
-		applyGearChanging(shift, gears, reverse);
+		applyGearChanging(shift, gears);
 		lookAround (camera);
 	}
 
@@ -59,7 +68,8 @@ public class CarController : MonoBehaviour {
 
 	void applyDrive(float accelerate, float brake) {
 		topSpeed = topGearSpeed * currentGear;
-		wheelColliders[0].brakeTorque = wheelColliders[1].brakeTorque = 0f;
+        //Debug.Log(accelerate);
+        wheelColliders[0].brakeTorque = wheelColliders[1].brakeTorque = 0f;
 		if (currentGear == -1) {
 			wheelColliders [0].motorTorque = wheelColliders [1].motorTorque = -maxReverseTorque * accelerate;
 			for (int i = 0; i < 2; i++) {
@@ -83,12 +93,34 @@ public class CarController : MonoBehaviour {
 		}
 	}
 
-	void applyGearChanging(float shift, float gears, float reverse) {
-		if (shift > 0f) {
+	void applyGearChanging(float shift, bool[] gears) {
+        Debug.Log("kvacilo: " + shift);
+        for (int i = 0; i < 7; i++)
+            Debug.Log("brzina" +i + ": " + gears[i]);
+
+        /*
+        if (shift > 0f) {
 			float f = Mathf.Abs (CurrentSpeed / topSpeed);
 			float upgearlimit = 0.8f;
 			float downgearlimit = (1 / (float)numberOfGears) * currentGear;
-		
+            
+            for (int i=0; i < numberOfGears + 2; i++)
+            {
+                if ((f >= upgearlimit || f < downgearlimit) && gears[i] > 0 && i < numberOfGears + 1 )
+                {
+                    currentGear = i + 1;
+                }
+                else if (gears[i] > 0)
+                {
+                    currentGear = -1;
+                }
+                else
+                {
+                    currentGear = 0;
+                }
+            }
+            
+            
 			if (currentGear > 0 && f < downgearlimit) {
 				if (gears < 0f)
 					currentGear--;
@@ -110,10 +142,33 @@ public class CarController : MonoBehaviour {
 				if (gears > 0f)
 					currentGear++;
 			}
+            
 		}
-	}
 
-	void lookAround(float camera) {
+    else
+        {
+            bool neutral = true;
+            for (int i = 0; i < numberOfGears + 2; i++)
+            {
+                if(gears[i]!=0f)
+                {
+                    Debug.Log("Everything ok");
+                    Debug.Log(currentGear);
+                    neutral = false;
+                    break;
+                }
+            }
+            if(neutral == true)
+            {
+                Debug.Log("Not driving");
+                Debug.Log(currentGear);
+            }
+
+        }
+    */
+    }
+
+    void lookAround(float camera) {
 		float viewAngle = 0.5f;
 		if (camera > 0.0f)
 			playerCamera.transform.localRotation = new Quaternion (0, viewAngle, 0, 1);

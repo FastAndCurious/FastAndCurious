@@ -19,7 +19,7 @@ public class AICarController :MonoBehaviour {
     private float currentRotationSpeed;
     private float currentDrivingSpeed;
 
-    public float maxRotationSpeed;//rotation speed
+    public float maxRotationSpeed = 20;//rotation speed
     public float maxDrivingSpeed;//movement speed
     public float acceleration;
     public float deceleration;
