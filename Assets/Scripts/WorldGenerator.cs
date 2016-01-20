@@ -129,7 +129,7 @@ public class WorldGenerator : MonoBehaviour
     private static float[] vanjske_tocke;                   //vanjski obrub grada: -polarni zapis
     private static int[,] kartezijeve_tocke;                //                     -kartezijev zapis
     private static Queue<Cravler> cravler;                  //spremnik za cravlera
-    private static int velicina_mape = 128;
+    private static int velicina_mape = 32;
 
     private static elementMape[][] pomMapa;
     private static int max_x, max_y, min_x, min_y;
