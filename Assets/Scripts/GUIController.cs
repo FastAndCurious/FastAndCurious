@@ -53,20 +53,34 @@ public class GUIController : MonoBehaviour {
         if (score >= 100) End();
 	}
 
-    public void BrokeLaw(int scoreToAdd)
+    public void PederstrianHit()
     {
-        faults += 1;
-        AddScore(scoreToAdd);
+        faults += 5;
+        AddScore(-1000);
         CheckFaults();
     }
 
-    public void AddScore(int scoreToAdd)
+    public void AICarHit()
+    {
+        faults += 5;
+        AddScore(-800);
+        CheckFaults();
+    }
+
+    public void RedLightPassed()
+    {
+        faults += 2;
+        AddScore(-500);
+        CheckFaults();
+    }
+
+    void AddScore(int scoreToAdd)
     {
         score += scoreToAdd;
         gText.text = score.ToString();
     }
 
-    private void CheckFaults()
+    void CheckFaults()
     {
         if (faults >= 4)
         {

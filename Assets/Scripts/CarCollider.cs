@@ -8,7 +8,9 @@ public class CarCollider : MonoBehaviour {
     private int pedestrianHit = 0;
     private int wallHit = 0;
     private int streetObjectHit = 0;
-    
+
+    private GUIController guiController = GameObject.Find("GUICanvas").GetComponent<GUIController>();
+
     int _carHit { get; set; }
     int _pedestrainHit { get; set; }
     int _wallHit { get; set; }
@@ -47,6 +49,7 @@ public class CarCollider : MonoBehaviour {
                 StartCoroutine(Blink(renderer, color, blink));
 
                 pedestrianHit++;
+                guiController.PederstrianHit();
 
             }
 
@@ -71,6 +74,7 @@ public class CarCollider : MonoBehaviour {
                 StartCoroutine(Blink(renderer, color, blink));
 
                 carHit++;
+                guiController.AICarHit();
 
             }
 
@@ -88,7 +92,6 @@ public class CarCollider : MonoBehaviour {
                 StartCoroutine(Blink(renderer, color, blink));
 
                 wallHit++;
-
             }
 
             if (col.collider.tag == "StreetObject")

@@ -26,7 +26,7 @@ public class RedLightCollider : MonoBehaviour {
     {
         if (collider.CompareTag("PlayerCar") && semaphore.isCarRed())
         {
-            guiController.BrokeLaw(-1000);
+            guiController.RedLightPassed();
         }
     }
 }
