@@ -589,7 +589,7 @@ public class WorldGenerator : MonoBehaviour
                 }
             }
 
-        /*
+        
         MapPartController[,] matricaSkripti = new MapPartController[velicina_mape, velicina_mape];
 
         for (int i = 0; i < velicina_mape; i++)
@@ -627,7 +627,7 @@ public class WorldGenerator : MonoBehaviour
 
                 }
             }
-        */
+        
         Debug.Log("izasao");
         
         foreach (elementZgrade zgrada in zgrade)

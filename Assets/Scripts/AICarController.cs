@@ -19,7 +19,7 @@ public class AICarController :MonoBehaviour {
     private float currentRotationSpeed;
     private float currentDrivingSpeed;
 
-    public float maxRotationSpeed = 20;//rotation speed
+    public float maxRotationSpeed = 50;//rotation speed
     public float maxDrivingSpeed;//movement speed
     public float acceleration;
     public float deceleration;
@@ -28,6 +28,7 @@ public class AICarController :MonoBehaviour {
     /// Sets the starting waypoint to be the nearest one.
     /// </summary>
     void Start() {
+        maxRotationSpeed = 50;
         allWaypoints = GameObject.FindGameObjectsWithTag("Waypoint");
         Transform nearestWaypoint = allWaypoints[0].transform;
         foreach(var wayPoint in allWaypoints) {
