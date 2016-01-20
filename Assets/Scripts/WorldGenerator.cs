@@ -119,7 +119,8 @@ public class elementZgrade
 
 public class WorldGenerator : MonoBehaviour
 {
-    
+    public GameObject Canvas;
+    public GameObject EventSystem;
     public GameObject prefabZgrada;
     public float velicina_blokova;
     public static elementMape[][] mapa;            //opisuje prometnu povezanost grada
@@ -130,7 +131,7 @@ public class WorldGenerator : MonoBehaviour
     private static float[] vanjske_tocke;                   //vanjski obrub grada: -polarni zapis
     private static int[,] kartezijeve_tocke;                //                     -kartezijev zapis
     private static Queue<Cravler> cravler;                  //spremnik za cravlera
-    private static int velicina_mape = 10;
+    public int velicina_mape = 10;
 
     private static elementMape[][] pomMapa;
     private static int max_x, max_y, min_x, min_y;
@@ -284,14 +285,16 @@ public class WorldGenerator : MonoBehaviour
 
         oznaciNaMapi(kartezijeve_tocke[broj_tocaka-1, 0], kartezijeve_tocke[broj_tocaka-1, 1], kartezijeve_tocke[0, 0], kartezijeve_tocke[0, 1]);
 
+        
+
         //napravi zaobilaznicu
         napraviZaobilaznicu(velicina_mape);
-
+        
 
         // napravi avenije
-        print("min_x:" + min_x + "max_x: " + max_x + " min_y: " + min_y + "max_y: "+ max_y);
+        //print("min_x:" + min_x + "max_x: " + max_x + " min_y: " + min_y + "max_y: "+ max_y);
 
-         
+
         for (int i = min_x + (int)(pojavljivanje_avenije * Random.value) + pojavljivanje_avenije; 
             i <  max_x - pojavljivanje_avenije; 
             i+= (int)(pojavljivanje_avenije * Random.value) + pojavljivanje_avenije)
@@ -339,10 +342,12 @@ public class WorldGenerator : MonoBehaviour
                     }
                 }
         }
+
+
         
         //postavljanje cravlera
 
-        
+
 
         for (int i = 0; i < velicina_mape; i++)
             for (int j = 0; j < velicina_mape; j++)
@@ -396,11 +401,13 @@ public class WorldGenerator : MonoBehaviour
 
 
 
-      
+
 
         // generiranje kvartovskih ulica
+        
         while (cravler.Count != 0)
         {
+           
             Cravler trenutni = cravler.Dequeue();
             float broj_nastavaka = Random.value;
             float[] smjer = { 1, 1, 1, 1 };
@@ -464,9 +471,9 @@ public class WorldGenerator : MonoBehaviour
         }
 
        
-
+        
         // debug print
-        string fileName = "debugIzlaz.txt"; 
+        string fileName = "debugIzlaz6.txt"; 
 
 		if (File.Exists(fileName))
 		{
@@ -513,8 +520,11 @@ public class WorldGenerator : MonoBehaviour
         }
 		sr.Close();
 
-
+        
         iscrtajMapu();
+        Instantiate(Canvas);
+        Instantiate(EventSystem);
+        
     }
 
     private void iscrtajMapu()
@@ -601,7 +611,7 @@ public class WorldGenerator : MonoBehaviour
         for (int i = 0; i < velicina_mape; i++)
             for (int j = 0; j < velicina_mape; j++)
             {
-                Debug.Log("mapa:" + i + " , " + j);
+
                 if (mapa[i][j].id > 0)
                 {
                     if (i > 0 && mapa[i - 1][j].id > 0)
@@ -626,7 +636,6 @@ public class WorldGenerator : MonoBehaviour
                 }
             }
         
-        Debug.Log("izasao");
         
         foreach (elementZgrade zgrada in zgrade)
         {
@@ -635,6 +644,8 @@ public class WorldGenerator : MonoBehaviour
             cube.transform.localScale = new Vector3((zgrada.x2 - zgrada.x1 + 1) * velicina_blokova, zgrada.visina*50, ((zgrada.y2 - zgrada.y1 + 1) * velicina_blokova));
             cube.transform.parent = ovaj.transform;
         }
+        
+
     }
 
     private int najveciPravokutnik() {

@@ -16,28 +16,34 @@ public class CarController : MonoBehaviour {
 	[SerializeField] private GameObject steeringWheel = null;
 	[SerializeField] private Camera playerCamera = null;
 
+    private bool[] lastGears = { false, false, false, false, false, false, false };
 	private float currentSteeringAngle;
-	public int currentGear = 1;
+	public int currentGear = 0;
 	private Rigidbody rigidBody;
 	public float topSpeed;
 
 	public float CurrentSpeed{ get { return rigidBody.velocity.magnitude * 3.6f; }}
     public float TopSpeed { get { return currentGear*topGearSpeed; } }
-
+    public int upaljenAuto = 0;
 
     void Start () {
 		wheelColliders [0].attachedRigidbody.centerOfMass = centerOfMass;
 		rigidBody = GetComponent<Rigidbody> ();
+        
 	}
 
 	void FixedUpdate () {
-		float accelerate = Input.GetAxis ("Accelerate");
+		float accelerate = -(Input.GetAxis ("Accelerate")-1)/2;
         Debug.Log("ubrzanje: " + accelerate);
         float steering = Input.GetAxis ("Steering");
-		float brake = Input.GetAxis ("Brake");
+		float brake = -(Input.GetAxis ("Brake") - 1)/2;
         Debug.Log("kocnica: " + brake);
-		float shift = Input.GetAxis ("Shift");
+		float shift = -(Input.GetAxis ("Shift") - 1)/2;
 		float camera = Input.GetAxis ("Camera");
+
+        bool upaliAuto = Input.GetButtonDown("upaliAuto");
+        Debug.Log("upali Auto" + upaliAuto);
+
         bool[] gears = { false, false, false, false, false, false, false };
         gears[0] = Input.GetButton("Gear1");
         gears[1] = Input.GetButton("Gear2");
@@ -67,6 +73,11 @@ public class CarController : MonoBehaviour {
 	}
 
 	void applyDrive(float accelerate, float brake) {
+
+        if (upaljenAuto == 0)
+            accelerate = 0;
+
+
 		topSpeed = topGearSpeed * currentGear;
         //Debug.Log(accelerate);
         wheelColliders[0].brakeTorque = wheelColliders[1].brakeTorque = 0f;
@@ -97,29 +108,36 @@ public class CarController : MonoBehaviour {
         Debug.Log("kvacilo: " + shift);
         for (int i = 0; i < 7; i++)
             Debug.Log("brzina" +i + ": " + gears[i]);
-
+        for (int i = 0; i < 7; i++)
+            if (lastGears[i] != gears[i] && shift < 0.5)
+                upaljenAuto = 0;
+       
         /*
-        if (shift > 0f) {
+        if (shift > 0f) {    
 			float f = Mathf.Abs (CurrentSpeed / topSpeed);
 			float upgearlimit = 0.8f;
 			float downgearlimit = (1 / (float)numberOfGears) * currentGear;
             
-            for (int i=0; i < numberOfGears + 2; i++)
+            for (int i=0; i < numberOfGears; i++)
             {
-                if ((f >= upgearlimit || f < downgearlimit) && gears[i] > 0 && i < numberOfGears + 1 )
+                if ((f >= upgearlimit || f < downgearlimit) && gears[i])
                 {
                     currentGear = i + 1;
-                }
-                else if (gears[i] > 0)
-                {
-                    currentGear = -1;
-                }
-                else
-                {
-                    currentGear = 0;
+                    break;
                 }
             }
+            if (gears[numberOfGears+1])
+            {
+                   currentGear = -1;       
+            }
             
+           }
+           else{    
+         if(!gears[numberOfGears])
+         {
+         upaljenAuto =  0;
+        }  
+        } 
             
 			if (currentGear > 0 && f < downgearlimit) {
 				if (gears < 0f)

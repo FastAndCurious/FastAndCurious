@@ -23,7 +23,19 @@ public class CarCollider : MonoBehaviour {
 
     void Start()
     {
-        guiController = GameObject.Find("GUICanvas").GetComponent<GUIController>();
+        //guiController = GameObject.Find("GUICanvas").GetComponent<GUIController>();
+    }
+
+    void Update()
+    {
+        if (guiController == null)
+        {
+            GameObject foundCanvas = GameObject.FindGameObjectWithTag("GUI");
+            if (foundCanvas != null)
+            {
+                guiController = foundCanvas.GetComponent<GUIController>();
+            }
+        }
     }
 
     void OnCollisionEnter(Collision col)
