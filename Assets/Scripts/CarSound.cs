@@ -18,6 +18,6 @@ public class CarSound : MonoBehaviour {
 
         CarController car = GetComponent<CarController>();
         carEngine.pitch = car.CurrentSpeed / car.topSpeed; 
-        Debug.Log(carEngine.clip.name + " " + carEngine.pitch);
+        //Debug.Log(carEngine.clip.name + " " + carEngine.pitch);
     }
 }

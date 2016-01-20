@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class Semaphore_1_1Controller : MonoBehaviour {
+public class Semaphore_1_1Controller : MonoBehaviour, ISemaphore {
 
     public Color red;
     public Color yellow;
@@ -14,6 +14,19 @@ public class Semaphore_1_1Controller : MonoBehaviour {
     public bool carRed;
     public bool pedestrianGreen;
     public bool pedestrianRed;
+
+    public bool isCarGreen()
+    {
+        return carGreen;
+    }
+    public bool isCarYellow()
+    {
+        return carYellow;
+    }
+    public bool isCarRed()
+    {
+        return carRed;
+    }
 
     private bool[] lights;
 
