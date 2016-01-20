@@ -130,7 +130,7 @@ public class WorldGenerator : MonoBehaviour
     private static float[] vanjske_tocke;                   //vanjski obrub grada: -polarni zapis
     private static int[,] kartezijeve_tocke;                //                     -kartezijev zapis
     private static Queue<Cravler> cravler;                  //spremnik za cravlera
-    private static int velicina_mape = 48;
+    private static int velicina_mape = 10;
 
     private static elementMape[][] pomMapa;
     private static int max_x, max_y, min_x, min_y;
@@ -459,10 +459,11 @@ public class WorldGenerator : MonoBehaviour
 
         foreach (elementZgrade zgrada in zgrade)
         {
-            zgrada.visina = 5*Mathf.PerlinNoise((zgrada.x1 + zgrada.x2) / (2*velicina_mape), (zgrada.y1 + zgrada.y2) / (2 * velicina_mape));
+            zgrada.visina = 10*Mathf.PerlinNoise((zgrada.x1 + zgrada.x2) / (2*velicina_mape), (zgrada.y1 + zgrada.y2) / (2 * velicina_mape)) ;
+            zgrada.visina += (float)(3 * (Random.value - 0.5));
         }
 
-        iscrtajMapu();
+       
 
         // debug print
         string fileName = "debugIzlaz.txt"; 
@@ -513,20 +514,21 @@ public class WorldGenerator : MonoBehaviour
 		sr.Close();
 
 
-
+        iscrtajMapu();
     }
 
     private void iscrtajMapu()
     {
+        bool playerPostoji = false;
         GameObject ovaj = GameObject.Find("WG_SpawnPoint");
         mapaBlokova = new GameObject[velicina_mape, velicina_mape];
         for (int i = 0; i < velicina_mape; i++)
-            for (int j = 0; j< velicina_mape; j++)
+            for (int j = 0; j < velicina_mape; j++)
             {
                 GameObject noviBlok;
-                Vector3 pomak = new Vector3((j ) * velicina_blokova, 0, (i) * velicina_blokova);
-                Quaternion zakret ;
-
+                Vector3 pomak = new Vector3((j) * velicina_blokova, 0, (i) * velicina_blokova);
+                Quaternion zakret;
+                
                 
                 switch (mapa[i][j].id)
                 {
@@ -534,33 +536,100 @@ public class WorldGenerator : MonoBehaviour
                     //  4: "╥"  5: "║"  6: "╔"  7: "╠"
                     //  8: "╡"  9: "╝"  10: "═" 11: "╩"
                     //  12: "╗" 13: "╣" 14: "╦" 15: "╬"
-                    case 1: noviBlok = U[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 2: noviBlok = R[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 3: noviBlok = UR[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 4: noviBlok = D[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 5: noviBlok = UD[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 6: noviBlok = RD[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 7: noviBlok = URD[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 8: noviBlok = L[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 9: noviBlok = UL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 10: noviBlok = RL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 11: noviBlok = URL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 12: noviBlok = DL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 13: noviBlok = UDL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 14: noviBlok = RDL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
-                    case 15: noviBlok = URDL[0]; zakret = Quaternion.Euler(0, 0, 0); break;
+                    case 1: noviBlok = U[0];  break;
+                    case 2: noviBlok = R[0];  break;
+                    case 3: noviBlok = UR[0];  break;
+                    case 4: noviBlok = D[0];  break;
+                    case 5: noviBlok = UD[0]; break;
+                    case 6: noviBlok = RD[0];  break;
+                    case 7: noviBlok = URD[0];  break;
+                    case 8: noviBlok = L[0];  break;
+                    case 9: noviBlok = UL[0];  break;
+                    case 10: noviBlok = RL[0];  break;
+                    case 11: noviBlok = URL[0];  break;
+                    case 12: noviBlok = DL[0];  break;
+                    case 13: noviBlok = UDL[0];  break;
+                    case 14: noviBlok = RDL[0];  break;
+                    case 15: noviBlok = URDL[0];  break;
 
                     default:
                         noviBlok = null;
-                        zakret = Quaternion.Euler(0, 0, 0);
                         break;
                 }
+                if (!playerPostoji && mapa[i][j].id == 5)
+                {
+                    noviBlok = UD[UD.Length - 1];
+                    playerPostoji = true;
+                }else if (!playerPostoji && mapa[i][j].id == 10)
+                {
+                    noviBlok = RL[RL.Length - 1];
+                    playerPostoji = true;
+                }else if (Random.value < 0.25)
+                {
+                    float slucajan = Random.value;
+                    if (slucajan == 1) slucajan = (float)0.99;
+                    if (mapa[i][j].id == 10 && RL.Length > 2)
+                    {
+                     
+                        int broj = (int)(slucajan * (RL.Length - 2) + 1);
+                        noviBlok = RL[broj];
+                    }
+                    if (mapa[i][j].id == 5 && UD.Length > 2)
+                    {
+                        int broj = (int)(slucajan * (UD.Length - 2) + 1);
+                        noviBlok = UD[broj];
+                    }
+                }
+                
+                zakret = Quaternion.Euler(0, 0, 0);
                 if (noviBlok != null)
                 {
                     mapaBlokova[i, j] = ((GameObject)GameObject.Instantiate(noviBlok, pomak, zakret));
                     mapaBlokova[i, j].transform.parent = ovaj.transform;
                 }
             }
+
+        /*
+        MapPartController[,] matricaSkripti = new MapPartController[velicina_mape, velicina_mape];
+
+        for (int i = 0; i < velicina_mape; i++)
+            for (int j = 0; j < velicina_mape; j++)
+                if (mapa[i][j].id > 0)
+                    matricaSkripti[i, j] = mapaBlokova[i, j].GetComponent<MapPartController>();
+
+
+        for (int i = 0; i < velicina_mape; i++)
+            for (int j = 0; j < velicina_mape; j++)
+            {
+                Debug.Log("mapa:" + i + " , " + j);
+                if (mapa[i][j].id > 0)
+                {
+                    if (i > 0 && mapa[i - 1][j].id > 0)
+                    {
+                        matricaSkripti[i, j].setSouthPart(matricaSkripti[i - 1, j]);
+                        matricaSkripti[i - 1, j].setNorthPart(matricaSkripti[i, j]);
+                    }
+                    if (i < velicina_mape - 1 && mapa[i + 1][j].id > 0)
+                    {
+                        matricaSkripti[i, j].setNorthPart(matricaSkripti[i + 1, j]);
+                        matricaSkripti[i + 1, j].setSouthPart(matricaSkripti[i, j]);
+                    }
+                    if (j > 0 && mapa[i][j - 1].id > 0)
+                    {
+                        matricaSkripti[i, j - 1].setEastPart(matricaSkripti[i, j]);
+                        matricaSkripti[i, j].setWestPart(matricaSkripti[i, j - 1]);
+                    }
+                    if (j < velicina_mape - 1 && mapa[i][j + 1].id > 0)
+                    {
+                        matricaSkripti[i, j + 1].setWestPart(matricaSkripti[i, j]);
+                        matricaSkripti[i, j].setEastPart(matricaSkripti[i, j + 1]);
+                    }
+
+                }
+            }
+        */
+        Debug.Log("izasao");
+        
         foreach (elementZgrade zgrada in zgrade)
         {
             Vector3 position = new Vector3(((zgrada.x2 + zgrada.x1) / 2) * velicina_blokova, zgrada.visina*50 / 2, ((zgrada.y2 + zgrada.y1) / 2 * velicina_blokova));
