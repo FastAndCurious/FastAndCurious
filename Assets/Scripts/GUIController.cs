@@ -23,16 +23,27 @@ public class GUIController : MonoBehaviour {
     private Text gText;
     private Text gNick;
 
+    public int timeForPoints = 5;
+    public int pointsForTime = 10;
+
+    private float lastPointedTime;
+
     void Start()
     {
         score = 0;
         gText = text.GetComponent<Text>();
-        car = GameObject.FindGameObjectWithTag("PlayerCar");
+        car = GameObject.Find("Player");
+        lastPointedTime = Time.time;
     }
 
     void Update()
     {
         //if (!ended) AddScore(1);
+        if (Time.time > lastPointedTime + timeForPoints)
+        {
+            lastPointedTime = Time.time;
+            AddScore(pointsForTime);
+        }
         if (paused)
         {
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -65,7 +76,7 @@ public class GUIController : MonoBehaviour {
         form.AddField("player", nick);
 
         Debug.Log("pravim request");
-        WWW www = new WWW("http://dito.ninja:3000/postscore", form);
+        WWW www = new WWW("http://dito.ninja/postscore", form);
 
         StartCoroutine(SendScoreToWebsite(www));
         Debug.Log("poslo request");
