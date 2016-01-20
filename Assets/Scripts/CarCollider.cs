@@ -65,7 +65,7 @@ public class CarCollider : MonoBehaviour {
                 AICarController aiCar = col.gameObject.GetComponent<AICarController>();
                 aiCar.enabled = false;
 
-                Renderer renderer = col.gameObject.GetComponent<Renderer>();
+                Renderer renderer = col.gameObject.transform.Find("model").GetComponent<Renderer>();
                 Color color = renderer.material.color;
                 Color blink = Color.black;
 
