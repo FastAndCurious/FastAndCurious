@@ -99,21 +99,26 @@ public class GUIController : MonoBehaviour {
     {
         faults += 5;
         AddScore(-1000);
-        CheckFaults();
+        //CheckFaults();
     }
 
     public void AICarHit()
     {
         faults += 5;
         AddScore(-800);
-        CheckFaults();
+        // CheckFaults();
     }
 
     public void RedLightPassed()
     {
         faults += 2;
         AddScore(-500);
-        CheckFaults();
+        //CheckFaults();
+    }
+
+    public void CarShutDown()
+    {
+        AddScore(-500);
     }
 
     void AddScore(int scoreToAdd)
