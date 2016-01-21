@@ -33,16 +33,20 @@ public class CarController : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		float accelerate = -(Input.GetAxis ("Accelerate")-1)/2;
-        Debug.Log("ubrzanje: " + accelerate);
+		float accelerate =(float)( -(Input.GetAxis ("Accelerate")-1)*0.9 + 0.1);
+        //Debug.Log("ubrzanje: " + accelerate);
         float steering = Input.GetAxis ("Steering");
 		float brake = -(Input.GetAxis ("Brake") - 1)/2;
-        Debug.Log("kocnica: " + brake);
+        //Debug.Log("kocnica: " + brake);
 		float shift = -(Input.GetAxis ("Shift") - 1)/2;
 		float camera = Input.GetAxis ("Camera");
+  
+        bool gumbUpaliAuto = Input.GetButtonDown("upaliAuto");
+        Debug.Log("upali Auto" + gumbUpaliAuto + "\nupaljenAuto" +upaljenAuto);
+        if (gumbUpaliAuto == true && upaljenAuto == 0)
+            upaliAuto();
 
-        bool upaliAuto = Input.GetButtonDown("upaliAuto");
-        Debug.Log("upali Auto" + upaliAuto);
+        
 
         bool[] gears = { false, false, false, false, false, false, false };
         gears[0] = Input.GetButton("Gear1");
@@ -52,10 +56,20 @@ public class CarController : MonoBehaviour {
         gears[4] = Input.GetButton("Gear5");
         gears[5] = Input.GetButton("Gear6");
         gears[6] = Input.GetButton("Gear7");
-        applySteering (steering);
-		applyDrive (accelerate, brake);
-		applyGearChanging(shift, gears);
-		lookAround (camera);
+
+
+        applySteering(steering);
+        applyGearChanging(shift, gears);
+
+        if (upaljenAuto == 0 || currentGear == 0 || shift > 0.5)
+            accelerate = 0;
+
+        applyDrive (accelerate, brake);
+        
+        lookAround (camera);
+
+        for (int i = 0; i < 7; i++)
+            lastGears[i] = gears[i];
 	}
 
 	void applySteering(float steering) {
@@ -73,12 +87,10 @@ public class CarController : MonoBehaviour {
 	}
 
 	void applyDrive(float accelerate, float brake) {
-
-        if (upaljenAuto == 0)
-            accelerate = 0;
-
-
-		topSpeed = topGearSpeed * currentGear;
+        if (currentGear != 0)
+            topSpeed = topGearSpeed * currentGear;
+        else
+            topSpeed = topGearSpeed * numberOfGears;
         //Debug.Log(accelerate);
         wheelColliders[0].brakeTorque = wheelColliders[1].brakeTorque = 0f;
 		if (currentGear == -1) {
@@ -105,85 +117,40 @@ public class CarController : MonoBehaviour {
 	}
 
 	void applyGearChanging(float shift, bool[] gears) {
-        Debug.Log("kvacilo: " + shift);
+        //Debug.Log("kvacilo: " + shift);
+        bool neutral = true;
         for (int i = 0; i < 7; i++)
-            Debug.Log("brzina" +i + ": " + gears[i]);
-        for (int i = 0; i < 7; i++)
-            if (lastGears[i] != gears[i] && shift < 0.5)
-                upaljenAuto = 0;
-       
-        /*
-        if (shift > 0f) {    
-			float f = Mathf.Abs (CurrentSpeed / topSpeed);
-			float upgearlimit = 0.8f;
-			float downgearlimit = (1 / (float)numberOfGears) * currentGear;
-            
-            for (int i=0; i < numberOfGears; i++)
-            {
-                if ((f >= upgearlimit || f < downgearlimit) && gears[i])
+            if (gears[i]) neutral = false;
+
+        if (neutral || gears[5] == true)
+            currentGear = 0;
+
+
+        if (shift > 0.5) { 
+           for (int i = 0; i < numberOfGears; i++)
                 {
-                    currentGear = i + 1;
-                    break;
+                    if (gears[i]) { 
+                        currentGear = i + 1;
+                        if (CurrentSpeed < i * topGearSpeed * 0.8 - 10)
+                            ugasiAuto();
+                   
+                    }
                 }
-            }
-            if (gears[numberOfGears+1])
+            if (gears[numberOfGears + 1])
             {
-                   currentGear = -1;       
+                currentGear = -1;
             }
-            
-           }
-           else{    
-         if(!gears[numberOfGears])
-         {
-         upaljenAuto =  0;
-        }  
-        } 
-            
-			if (currentGear > 0 && f < downgearlimit) {
-				if (gears < 0f)
-					currentGear--;
-			}
-		
-			if (f >= upgearlimit && (currentGear < numberOfGears)) {
-				if (gears > 0f)
-					currentGear++;
-			}
-
-			if (currentGear == 0) {
-				if (gears > 0f)
-					currentGear++;
-				else if (reverse > 0f)
-					currentGear--;
-			}
-
-			if (currentGear == -1) {
-				if (gears > 0f)
-					currentGear++;
-			}
-            
-		}
-
-    else
-        {
-            bool neutral = true;
-            for (int i = 0; i < numberOfGears + 2; i++)
-            {
-                if(gears[i]!=0f)
-                {
-                    Debug.Log("Everything ok");
-                    Debug.Log(currentGear);
-                    neutral = false;
-                    break;
-                }
-            }
-            if(neutral == true)
-            {
-                Debug.Log("Not driving");
-                Debug.Log(currentGear);
-            }
-
         }
-    */
+    }
+
+    void ugasiAuto()
+    {
+        upaljenAuto = 0;
+    }
+
+    void upaliAuto()
+    {
+        upaljenAuto = 1;
     }
 
     void lookAround(float camera) {

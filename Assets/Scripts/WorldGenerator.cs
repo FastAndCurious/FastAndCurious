@@ -140,6 +140,9 @@ public class WorldGenerator : MonoBehaviour
 
     private static int[,] mapaBool;
 
+    private static int playerx, playery, playerxold, playeryold;
+
+
     //oznacava sve blokove ispod proslijedene linije
     private static void oznaciNaMapi(int x1, int y1, int x2, int y2)
     {
@@ -488,9 +491,9 @@ public class WorldGenerator : MonoBehaviour
 			string buffer = "";
             for (int j = 0; j < velicina_mape; j++)
             {
-                if (false && mapa[i][j].opcija == 1)
-                    buffer += "+";
-                else 
+                //if (false && mapa[i][j].opcija == 1)
+                //    buffer += "+";
+                //else 
                 switch (mapa[i][j].id)
                 {
                     case 0: buffer += " "; break;
@@ -524,6 +527,36 @@ public class WorldGenerator : MonoBehaviour
         iscrtajMapu();
         Instantiate(Canvas);
         Instantiate(EventSystem);
+        
+    }
+
+    void Update()
+    {
+        
+        Vector3 vectorPozicija = GameObject.FindGameObjectWithTag("PlayerCar").transform.position;
+
+        int pozicijax = ((int)vectorPozicija.z) / (int)velicina_blokova;
+        int pozicijay = ((int)vectorPozicija.x) / (int)velicina_blokova;
+        Debug.Log(pozicijax + " , " + pozicijay);
+
+        if (playerxold != pozicijax || playeryold != pozicijay)
+        {
+            for (int i = 0; i < velicina_mape; i++)
+                for (int j = 0; j < velicina_mape; j++)
+                    if (Mathf.Abs(pozicijax - i) <= 3 && (Mathf.Abs(pozicijay - j) <= 3))
+                    {
+                        if (mapa[i][j].id > 0)
+                            mapaBlokova[i, j].SetActive(true);
+                    }
+                    else
+                        if (!(playerx == j && playery == i))
+                            if (mapa[i][j].id > 0)
+                                mapaBlokova[i, j].SetActive(false);
+
+            playerxold = pozicijax;
+            playeryold = pozicijay;
+        }
+
         
     }
 
@@ -570,11 +603,16 @@ public class WorldGenerator : MonoBehaviour
                 {
                     noviBlok = UD[UD.Length - 1];
                     playerPostoji = true;
+                    playerxold = playerx = j;
+                    playeryold = playery = i;
                 }else if (!playerPostoji && mapa[i][j].id == 10)
                 {
                     noviBlok = RL[RL.Length - 1];
                     playerPostoji = true;
-                }else if (Random.value < 0.25)
+                    playerxold = playerx = j;
+                    playeryold = playery = i;
+                }
+                else if (Random.value < 0.25)
                 {
                     float slucajan = Random.value;
                     if (slucajan == 1) slucajan = (float)0.99;
@@ -596,6 +634,7 @@ public class WorldGenerator : MonoBehaviour
                 {
                     mapaBlokova[i, j] = ((GameObject)GameObject.Instantiate(noviBlok, pomak, zakret));
                     mapaBlokova[i, j].transform.parent = ovaj.transform;
+                    //mapaBlokova[i, j].SetActive(false);
                 }
             }
 
@@ -649,7 +688,7 @@ public class WorldGenerator : MonoBehaviour
     }
 
     private int najveciPravokutnik() {
-        int x1 = -1, x2 = -1 , y1 = -1, y2 = -1, z = -1;
+        int x1 = -1, x2 = -1 , y1 = -1, y2 = -1;
 
         int[,] lijevo = new int[velicina_mape, velicina_mape];
         int[,] desno = new int[velicina_mape, velicina_mape];
@@ -691,7 +730,7 @@ public class WorldGenerator : MonoBehaviour
                 if (maxArea < newArea)
                 {
                     maxArea = newArea;
-                    z = i;
+                    
                     x1 = j - moguLijevo + 1;
                     x2 = j + moguDesno - 1;
                     y1 = i - zadnji +1;
@@ -711,64 +750,8 @@ public class WorldGenerator : MonoBehaviour
 
         zgrade.Add(new elementZgrade(x1, y1, x2, y2, visina));
         //Debug.Log("maxArea:" + maxArea + '\n' + ' ' + x1 + ' ' + y1 + ", " + x2 + ' ' + y2);
-        /*
-        string fileName = "debugIzlaz2.txt";
-
-        if (File.Exists(fileName))
-        {
-            Debug.Log(fileName + " already exists.");
-            //return 0;
-        }
-        var sr = File.CreateText(fileName);
-
-
-        for (int i = velicina_mape - 1; i >= 0; i--)
-        {
-            string buffer = "";
-            for (int j = 0; j < velicina_mape; j++)
-            {
-                
-                buffer += lijevo[i, j].ToString("  00");
-
-            }
-            sr.WriteLine(buffer);
-
-        }
-        sr.Close();
-
-
-        fileName = "debugIzlaz1.txt";
-
-        if (File.Exists(fileName))
-        {
-            Debug.Log(fileName + " already exists.");
-            //return;
-        }
-        sr = File.CreateText(fileName);
-
-
-        for (int i = velicina_mape - 1; i >= 0; i--)
-        {
-            string buffer = "";
-            for (int j = 0; j < velicina_mape; j++)
-            {
-
-                buffer += desno[i, j].ToString("  00");
-
-            }
-            sr.WriteLine(buffer);
-
-        }
-        sr.Close();
-        */
+        
         return 0;
     }
 
-    private void izracunajKutoveZgrada()
-    {
-        for (int i = 0; i < zgrade.Count; i++)
-        {
-            zgrade[i].x1 = (zgrade[i].x1 - velicina_mape / 2) * velicina_blokova / 2;
-        }
-    }
 }
